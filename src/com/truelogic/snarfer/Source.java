@@ -213,11 +213,15 @@ public class Source
             *******************************************************************/
             if ((!oLink.isHTTPLink()) || 
                 (oLink.getLink().indexOf("#") != -1) ||
-                (strLink.endsWith(".png")) ||
-                (strLink.endsWith(".jpg")) ||
-                (strLink.endsWith(".pdf")) ||
-                (strLink.endsWith(".ram")) ||
-                (strLink.endsWith(".gif")) ||
+                (strLink.toUpperCase().endsWith(".PNG")) ||
+                (strLink.toUpperCase().endsWith(".JPG")) ||
+                (strLink.toUpperCase().endsWith(".PDF")) ||
+                (strLink.toUpperCase().endsWith(".M4V")) ||
+                (strLink.toUpperCase().endsWith(".RAM")) ||
+                (strLink.toUpperCase().endsWith(".MP3")) ||
+                (strLink.toUpperCase().endsWith(".GIF")) ||
+                (strLink.toUpperCase().endsWith(".SWF")) ||
+                (strLink.toUpperCase().endsWith(".XML")) ||
                 (oLink.getLink().length() == 0) ||
                 (!strURL.toLowerCase().startsWith(strBase.toLowerCase())))
                 continue;
