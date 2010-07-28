@@ -3,9 +3,7 @@ package com.truelogic.snarfer;
 import java.util.*;
 import java.net.*;
 
-import org.htmlparser.*;
 import org.htmlparser.filters.TagNameFilter;
-import org.htmlparser.nodes.*;
 import org.htmlparser.util.*;
 import org.htmlparser.tags.*;
 
@@ -90,7 +88,7 @@ public class Source
     public void run()
     {
         oArticleList = getArticleList();
-        System.out.println("Articles Found: " + oArticleList.size());
+//        System.out.println("Articles Found: " + oArticleList.size());
     }
 
     private Vector<Article> getArticleList()
@@ -144,11 +142,14 @@ public class Source
             if ((!oLink.isHTTPLink()) || 
                 (strLink.indexOf("#") != -1) ||
                 (strLink.length() == 0) ||
-                (strLink.endsWith(".png")) ||
-                (strLink.endsWith(".jpg")) ||
-                (strLink.endsWith(".pdf")) ||
-                (strLink.endsWith(".ram")) ||
-                (strLink.endsWith(".gif")) ||
+                (strLink.toUpperCase().endsWith(".PNG")) ||
+                (strLink.toUpperCase().endsWith(".JPG")) ||
+                (strLink.toUpperCase().endsWith(".PDF")) ||
+                (strLink.toUpperCase().endsWith(".M4V")) ||
+                (strLink.toUpperCase().endsWith(".RAM")) ||
+                (strLink.toUpperCase().endsWith(".SWF")) ||
+                (strLink.toUpperCase().endsWith(".GIF")) ||
+                (strLink.toUpperCase().endsWith(".XML")) ||
                 (strLink.endsWith("/")) ||
                 (!strLink.toLowerCase().startsWith(strBase.toLowerCase())))
                 continue;
@@ -190,7 +191,7 @@ public class Source
                 
                 oArticleHash.put(strLink, oArticle);
              
-                System.out.println(strLink + " (" + iDepth + "," + oArticle.getText().length() + ")");
+//                System.out.println(strLink + " (" + iDepth + "," + oArticle.getText().length() + ")");
             }
         }
 

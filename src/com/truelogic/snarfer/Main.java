@@ -1,7 +1,7 @@
 package com.truelogic.snarfer;
 
-import java.sql.Date;
 import java.util.*;
+
 import com.truelogic.common.*;
 
 public class Main 
@@ -14,7 +14,7 @@ public class Main
         int iImageWidthMin;
         int iAspectRatioMax;
         int iArticleSizeMin;
-        int iArticleCountMin;
+//        int iArticleCountMin;
         int iArticleChunkSizeMin;
         int iDepthMax;
     }
@@ -80,7 +80,7 @@ public class Main
     public static void main(String[] args) throws Exception
     {
         loadParams();
-        java.sql.Date oDate = null;
+        java.sql.Date oDate = null;//new java.sql.Date(110, 6, 28);
         Snarfer oSnarfer = new Snarfer();
         
         if ((args.length == 0) || (!args[0].equalsIgnoreCase("dump")))

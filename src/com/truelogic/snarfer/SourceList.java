@@ -4,7 +4,7 @@ import java.util.*;
 
 public class SourceList 
     {
-    Vector<Source> oList = new Vector();
+    Vector<Source> oList = new Vector<Source>();
     
     public void add(Source oSource)
     {

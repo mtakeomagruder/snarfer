@@ -39,25 +39,25 @@ import java.util.*;
 public class IniFile
     {
     /***************************************************************************
+     * IniValue class implementation - This class stores an ini file key-value
+     ***************************************************************************/
+     private class IniValue
+         {
+         public String strKey;
+         public String strValue;
+         }
+
+    /***************************************************************************
     * IniSection class implementation - This class stores an ini file section
     ***************************************************************************/
     private class IniSection
         {
         public String strName;
-        public Vector oValues; 
-        }
-
-    /***************************************************************************
-    * IniValue class implementation - This class stores an ini file key-value
-    ***************************************************************************/
-    private class IniValue
-        {
-        public String strKey;
-        public String strValue;
+        public Vector<IniValue> oValues; 
         }
 
     private BufferedReader oFile;               // Ini file 
-    private Vector oSections = new Vector();    // Ini file section list
+    private Vector<IniSection> oSections = new Vector<IniSection>();    // Ini file section list
 
     /***************************************************************************
     *                               IniFile
@@ -101,7 +101,7 @@ public class IniFile
 
                         oSection.strName = strLine.substring(1,
                                            strLine.length() - 1);
-                        oSection.oValues = new Vector(); 
+                        oSection.oValues = new Vector<IniValue>(); 
                         oSections.add(oSection);
                         }
                     /***********************************************************

@@ -4,9 +4,10 @@ import java.sql.*;
 import java.util.*;
 import java.io.*;
 
-import com.sun.image.codec.jpeg.*;
 import java.awt.*;
 import java.awt.image.*;
+import javax.imageio.*;
+import javax.imageio.stream.*;
 
 public class DBToFile 
 {
@@ -26,7 +27,7 @@ public class DBToFile
         String strImageURL;
         byte[] tyImage;
         int iBatchID;
-        java.util.Date oBatchDay;
+//        java.util.Date oBatchDay;
     }
     
     private class Source
@@ -70,18 +71,18 @@ public class DBToFile
         return(strOutputDir);
     }
     
-    private java.sql.Date getDate()
+/*    private java.sql.Date getDate()
     {
         return(oDate);
-    }
+    }*/
 
-    private String getDateString()
+/*    private String getDateString()
     {
         Calendar oDate = Calendar.getInstance();
         oDate.setTimeInMillis(getDate().getTime());
         
         return(oDate.get(Calendar.YEAR) + padInt(oDate.get(Calendar.MONTH) + 1, 2) + padInt(oDate.get(Calendar.DAY_OF_MONTH) + 1, 2));
-    }
+    }*/
 
     private int getImageWidth()
     {
@@ -143,8 +144,12 @@ public class DBToFile
                 String strFileName = oSource.strTextID + "-" + padInt(iArticleIdx, 3);
             
                 oTextWriter = new FileWriter(strSourceOutputDir + strFileName + ".txt");
+                
+                String strText = oArticle.strText.replaceAll("\\&\\#039\\;", "'");
+                strText = strText.replaceAll("\\&\\#[0-9]+\\;", "");
+                strText = strText.replaceAll("\\&[a-z]+\\;", "");
 
-                oTextWriter.write("content=" + oArticle.strText);
+                oTextWriter.write("content=" + strText.trim());
                 oTextWriter.close();
                 
                 FileOutputStream oImageWriter = new FileOutputStream(strSourceOutputDir + strFileName + ".jpg");
@@ -193,8 +198,7 @@ public class DBToFile
     private byte[] resizeImage(byte[] tyImage, int iWidth, int iHeight, int iQuality) throws IOException
     {
         ByteArrayInputStream oInput = new ByteArrayInputStream(tyImage);
-        JPEGImageDecoder oDecoder = JPEGCodec.createJPEGDecoder(oInput);
-        BufferedImage oImage = oDecoder.decodeAsBufferedImage();
+        BufferedImage oImage = ImageIO.read(oInput);
         
         BufferedImage oImageNew = new BufferedImage(iWidth, iHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D oGraphics = oImageNew.createGraphics();
@@ -203,11 +207,17 @@ public class DBToFile
         oGraphics.drawImage(oImage, 0, 0, iWidth, iHeight, null);
         
         ByteArrayOutputStream oOutput = new ByteArrayOutputStream();
-        JPEGImageEncoder oEncoder = JPEGCodec.createJPEGEncoder(oOutput);
-        JPEGEncodeParam oParam = oEncoder.getDefaultJPEGEncodeParam(oImageNew);
-        oParam.setQuality((float)iQuality / 100.0f, false);
-        oEncoder.setJPEGEncodeParam(oParam);                
-        oEncoder.encode(oImageNew);
+        MemoryCacheImageOutputStream oImageOutput = new MemoryCacheImageOutputStream(oOutput);
+        Iterator<ImageWriter> oImageIterator = ImageIO.getImageWritersByFormatName("jpeg");
+        ImageWriter oImageWriter = (ImageWriter)oImageIterator.next();
+        ImageWriteParam oImageWriterParam = oImageWriter.getDefaultWriteParam();
+        oImageWriterParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+        oImageWriterParam.setCompressionQuality((float) .9);   // an integer between 0 and 1
+        
+        oImageWriter.setOutput(oImageOutput);
+        IIOImage oImageTemp = new IIOImage(oImageNew, null, null);
+        oImageWriter.write(null, oImageTemp, oImageWriterParam);
+        oImageWriter.dispose();
                 
         return(oOutput.toByteArray());
     }
@@ -337,7 +347,7 @@ public class DBToFile
                oArticle.tyImage = oImage.toByteArray();
 
                oArticle.iBatchID = oResult.getInt("batch_id");
-               oArticle.oBatchDay = oResult.getDate("batch_day");
+//               oArticle.oBatchDay = oResult.getDate("batch_day");
                               
                oArticleList.add(oArticle);
            }

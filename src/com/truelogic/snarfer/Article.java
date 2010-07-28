@@ -3,11 +3,9 @@ package com.truelogic.snarfer;
 import java.util.*;
 import java.net.*;
 import java.io.*;
-import java.nio.*;
-
-import com.sun.image.codec.jpeg.*;
-import java.awt.*;
 import java.awt.image.*;
+import javax.imageio.*;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import org.htmlparser.*;
 import org.htmlparser.filters.TagNameFilter;
@@ -17,7 +15,7 @@ import org.htmlparser.tags.*;
 
 public class Article 
 {
-    private Source oSource;
+//    private Source oSource;
     private String strURL;
     private int iTier;
     private boolean bGood = false;
@@ -31,7 +29,7 @@ public class Article
     
     public Article(Source oSource, int iTier, String strURL, int iImageWidthMin, int iAspectRatioMax, int iArticleSizeMin, int iArticleChunkSizeMin)
     {
-        this.oSource = oSource;
+//        this.oSource = oSource;
         this.strURL = strURL;
         this.iTier = iTier;
         
@@ -292,21 +290,25 @@ public class Article
             {
                 oURL = new URL(strImageURL);
                 oHTTP = (HttpURLConnection) oURL.openConnection();
+                int iBorder = 1;
                 
                 oInput = oHTTP.getInputStream();
                 
-                JPEGImageDecoder oDecoder = JPEGCodec.createJPEGDecoder(oHTTP.getInputStream());
-                BufferedImage oImage = oDecoder.decodeAsBufferedImage();
-
-                int iBorder = 1;
-
+                BufferedImage oImage = ImageIO.read(oInput);
                 BufferedImage oNewImage = oImage.getSubimage(iBorder, iBorder, oImage.getWidth() - (iBorder * 2), oImage.getHeight() - (iBorder * 2));
+
                 ByteArrayOutputStream oOutput = new ByteArrayOutputStream();
-                JPEGImageEncoder oEncoder = JPEGCodec.createJPEGEncoder(oOutput);
-                JPEGEncodeParam oParam = oEncoder.getDefaultJPEGEncodeParam(oNewImage);
-                oParam.setQuality(90.0f / 100.0f, false);
-                oEncoder.setJPEGEncodeParam(oParam);                
-                oEncoder.encode(oNewImage);
+                MemoryCacheImageOutputStream oImageOutput = new MemoryCacheImageOutputStream(oOutput);
+                Iterator<ImageWriter> oImageIterator = ImageIO.getImageWritersByFormatName("jpeg");
+                ImageWriter oImageWriter = (ImageWriter)oImageIterator.next();
+                ImageWriteParam oImageWriterParam = oImageWriter.getDefaultWriteParam();
+                oImageWriterParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                oImageWriterParam.setCompressionQuality((float) .9);   // an integer between 0 and 1
+                
+                oImageWriter.setOutput(oImageOutput);
+                IIOImage oImageTemp = new IIOImage(oNewImage, null, null);
+                oImageWriter.write(null, oImageTemp, oImageWriterParam);
+                oImageWriter.dispose();
                 
                 oBuffer = oOutput.toByteArray();
                 setImageURL(strImageURL);
