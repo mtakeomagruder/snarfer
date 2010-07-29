@@ -6,9 +6,9 @@ public class Snarfer
 {
     Vector<Source> oSourceList = new Vector<Source>();
     
-    public void sourceAdd(String strID, String strName, String strURL, int iDepthMax, int iImageWidthMin, int iAspectRatioMax, int iArticleSizeMin, int iArticleChunkSizeMin) throws Exception
+    public void sourceAdd(String strID, String strName, Vector<String> strURLs, int iImageWidthMin, int iAspectRatioMax, int iArticleSizeMin, int iArticleChunkSizeMin) throws Exception
     {
-        Source oSource = new Source(strID, strName, strURL, iDepthMax, iImageWidthMin, iAspectRatioMax, iArticleSizeMin, iArticleChunkSizeMin);
+        Source oSource = new Source(strID, strName, strURLs, iImageWidthMin, iAspectRatioMax, iArticleSizeMin, iArticleChunkSizeMin);
         oSourceList.add(oSource);
     }
     

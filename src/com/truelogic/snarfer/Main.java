@@ -9,14 +9,14 @@ public class Main
     private static class Source
     {
         String strID;
-        String strURL;
+        Vector<String> strURLs = new Vector<String>();
         String strName;
         int iImageWidthMin;
         int iAspectRatioMax;
         int iArticleSizeMin;
 //        int iArticleCountMin;
         int iArticleChunkSizeMin;
-        int iDepthMax;
+//        int iDepthMax;
     }
 
     private static String strConnect;
@@ -53,7 +53,18 @@ public class Main
                 Source oSource = new Source();
 
                 oSource.strID = oIni.StringGet("source", "source" + (iSourceIdx + 1));
-                oSource.strURL = oIni.StringGet(oSource.strID, "url");
+
+                int iIndex = 1;
+                String strURL = oIni.StringGet(oSource.strID, "url" + iIndex, null);
+                
+                while (strURL != null)
+                {
+                    oSource.strURLs.add(strURL);
+
+                    iIndex++;
+                    strURL = oIni.StringGet(oSource.strID, "url" + iIndex, null);
+                }
+                
                 oSource.strName = oIni.StringGet(oSource.strID, "name");
                 
                 oSource.iImageWidthMin = oIni.IntGet(oSource.strID, "image_width_min", 
@@ -64,8 +75,8 @@ public class Main
                                               oIni.IntGet("source_default", "article_size_min", 1000));
                 oSource.iArticleChunkSizeMin = oIni.IntGet(oSource.strID, "article_chunk_size_min", 
                                                    oIni.IntGet("source_default", "article_chunk_size_min", 100));
-                oSource.iDepthMax = oIni.IntGet(oSource.strID, "depth_max", 
-                                        oIni.IntGet("source_default", "depth_max", 2));
+//                oSource.iDepthMax = oIni.IntGet(oSource.strID, "depth_max", 
+//                                        oIni.IntGet("source_default", "depth_max", 2));
 
                 if (oSource.strID != null)
                     oSourceList.add(oSource);
@@ -89,7 +100,7 @@ public class Main
             {
                 Source oSource = oSourceList.get(iSourceIdx);
 
-                oSnarfer.sourceAdd(oSource.strID, oSource.strName, oSource.strURL, oSource.iDepthMax, oSource.iImageWidthMin, oSource.iAspectRatioMax, oSource.iArticleSizeMin, oSource.iArticleChunkSizeMin);
+                oSnarfer.sourceAdd(oSource.strID, oSource.strName, oSource.strURLs, oSource.iImageWidthMin, oSource.iAspectRatioMax, oSource.iArticleSizeMin, oSource.iArticleChunkSizeMin);
             }
 
             oSnarfer.run();

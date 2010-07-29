@@ -34,7 +34,7 @@ public class SnarferToDB
             {
                 Source oSource = oSnarfer.sourceGet(iSourceIdx);
 
-                iSourceID = storeSource(oSource.getID(), oSource.getName(), oSource.getURL());
+                iSourceID = storeSource(oSource.getID(), oSource.getName(), oSource.getURLs().get(0));
 
                 for (int iArticleIdx = 0; iArticleIdx < oSource.articleSize(); iArticleIdx++)
                 {
@@ -179,6 +179,4 @@ public class SnarferToDB
         
     return(iArticleID);
     }
-    
-    
 }

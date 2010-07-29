@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/HtmlParser/1.6/lib/htmlparser.jar"/>
 	<classpathentry kind="lib" path="lib/PostgreSQL/8.3/postgresql-8.3-605.jdbc3.jar"/>
+	<classpathentry kind="lib" path="lib/Rome/1.0/rome-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/JDom/1.1.1/jdom.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
