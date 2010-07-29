@@ -178,7 +178,13 @@ create or replace function article_list_get(iBatchID int, iSourceID int, iLimit 
 declare
     xArticle article_record%rowtype;
     iCount int;
+    dtDay date;
 begin
+    select day
+      into dtDay
+      from batch
+     where id = iBatchID;
+
     iCount = 0;
     
     for xArticle in 
@@ -201,58 +207,17 @@ begin
         where source.id = iSourceID
           and source.id = source_url.source_id
           and source_url.id = article.source_url_id
-          and batch.id = iBatchID
+          and batch.day >= dtDay - interval '30 days'
+          and batch.id <= iBatchID
           and batch.id = batch_article.batch_id
           and batch_article.article_id = article.id
           and article.image_id = image.id
-        order by article.tier, article.random_id
+        order by batch.day desc, article.tier, article.random_id
         limit iLimit
     loop
         iCount = iCount + 1;
         return next xArticle;
     end loop;
-
-    if iCount < iLimit then
-        for xArticle in 
-            select article.id,
-                   article.random_id,
-                   article.source_url_id,
-                   article.tier,
-                   length(article.data),
-                   encode(digest(article.data, 'md5'), 'hex') as hash,
-                   article.url,
-                   article.data,
-                   image.id as image_id,
-                   image.size as image_size,
-                   image.md5 as image_hash,
-                   image.url as image_url,
-                   image.data as image_data,
-                   batch.id as batch_id,
-                   batch.day as batch_day
-            from article, image, source, source_url, vw_article_batch_min, batch
-            where source.id = iSourceID
-              and source.id = source_url.source_id
-              and source_url.id = article.source_url_id
-              and article.image_id = image.id
-              and article.id in 
-                  (
-                  select article.id
-                  from batch, article, batch batch_other, batch_article
-                  where batch.id = 1686
-                  and article.id = batch_article.article_id
-                  and article.tier <> 1
-                  and batch_article.batch_id = batch_other.id
-                  and batch_other.day < batch.day
-                  order by article.random_id
-                  limit iLimit - iCount + 1
-                  )
-              and article.id = vw_article_batch_min.article_id
-              and vw_article_batch_min.batch_id = batch.id
-            order by batch.day desc, article.random_id
-        loop
-            return next xArticle;
-        end loop;
-    end if;
 end;
 $$ language 'plpgsql';
 
