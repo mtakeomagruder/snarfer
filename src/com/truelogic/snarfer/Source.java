@@ -82,7 +82,7 @@ public class Source
     public void run()
     {
         oArticleList = getArticleList();
-        System.out.println("Articles Found: " + oArticleList.size());
+//        System.out.println("Articles Found: " + oArticleList.size());
     }
 
     private Vector<Article> getArticleList()
@@ -138,7 +138,7 @@ public class Source
                           
                           oArticleHash.put(oEntry.getUri(), oArticle);
                        
-                          System.out.println(oEntry.getUri() + " (" + iDepth + "," + oArticle.getText().length() + ")");
+//                          System.out.println(oEntry.getUri() + " (" + iDepth + "," + oArticle.getText().length() + ")");
                       }
 
                       if (iDepth == 1)
