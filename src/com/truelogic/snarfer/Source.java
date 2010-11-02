@@ -11,27 +11,14 @@ import com.sun.syndication.io.XmlReader;
 public class Source
 {
     Vector<Article> oArticleList = new Vector<Article>();
-    private String strID;
-    private String strName;
-    private Vector<String> strURLs;
-    private int iImageWidthMin;
-    private int iAspectRatioMax;
-    private int iArticleSizeMin;
-    private int iArticleChunkSizeMin;
+    SourceData oData;
     
-    public Source(String strID, String strName, Vector<String> strURLs, int iImageWidthMin, int iAspectRatioMax, int iArticleSizeMin, int iArticleChunkSizeMin) throws Exception
+    public Source(SourceData oData) throws Exception
     {
-        if (strID == null || strURLs == null || strURLs.size() == 0)
+        if (oData.getID() == null || oData.getURLs() == null || oData.getURLs().size() == 0)
             throw new Exception("strID and strURL must be set");
         
-        this.strID = strID;
-        this.strName = strName;
-        this.strURLs = strURLs;
-        
-        this.iImageWidthMin = iImageWidthMin;
-        this.iAspectRatioMax = iAspectRatioMax;
-        this.iArticleSizeMin = iArticleSizeMin;
-        this.iArticleChunkSizeMin = iArticleChunkSizeMin;
+        this.oData = oData;
     }
     
     public int articleSize()
@@ -46,43 +33,22 @@ public class Source
     
     public String getID()
     {
-        return(strID);
+        return(oData.getID());
     }
 
     public String getName()
     {
-        return(strName);
+        return(oData.getName());
     }
     
     public Vector<String> getURLs()
     {
-        return(strURLs);
+        return(oData.getURLs());
     }
 
-    public int getImageWidthMin()
-    {
-        return(iImageWidthMin);
-    }
-
-    public int getAspectRatioMax()
-    {
-        return(iAspectRatioMax);
-    }
-    
-    public int getArticleChunkSizeMin()
-    {
-        return(iArticleChunkSizeMin);
-    }
-
-    public int getArticleSizeMin()
-    {
-        return(iArticleSizeMin);
-    }
-    
     public void run()
     {
         oArticleList = getArticleList();
-//        System.out.println("Articles Found: " + oArticleList.size());
     }
 
     private Vector<Article> getArticleList()
@@ -127,7 +93,9 @@ public class Source
                      /*******************************************************************
                       * Attempt to retrieve the article and store it if it looks good
                       *******************************************************************/
-                      Article oArticle = new Article(this, iDepth, oEntry.getUri(), getImageWidthMin(), getAspectRatioMax(), getArticleSizeMin(), getArticleChunkSizeMin());
+                      Article oArticle = new Article(this, iDepth, oEntry.getUri(), oData.getImageWidthMin(), 
+                                                     oData.getAspectRatioMax(), oData.getArticleSizeMin(), 
+                                                     oData.getArticleChunkSizeMin());
 
                       if (oArticle.retrieve())
                       {
@@ -137,8 +105,6 @@ public class Source
                               oArticleList.add(oArticle);
                           
                           oArticleHash.put(oEntry.getUri(), oArticle);
-                       
-//                          System.out.println(oEntry.getUri() + " (" + iDepth + "," + oArticle.getText().length() + ")");
                       }
 
                       if (iDepth == 1)

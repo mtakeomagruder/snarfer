@@ -15,7 +15,6 @@ import org.htmlparser.tags.*;
 
 public class Article 
 {
-//    private Source oSource;
     private String strURL;
     private int iTier;
     private boolean bGood = false;
@@ -27,9 +26,9 @@ public class Article
     private String strText = null;
     private String strImageURL = null;
     
-    public Article(Source oSource, int iTier, String strURL, int iImageWidthMin, int iAspectRatioMax, int iArticleSizeMin, int iArticleChunkSizeMin)
+    public Article(Source oSource, int iTier, String strURL, int iImageWidthMin, int iAspectRatioMax, 
+                   int iArticleSizeMin, int iArticleChunkSizeMin)
     {
-//        this.oSource = oSource;
         this.strURL = strURL;
         this.iTier = iTier;
         
@@ -295,7 +294,8 @@ public class Article
                 oInput = oHTTP.getInputStream();
                 
                 BufferedImage oImage = ImageIO.read(oInput);
-                BufferedImage oNewImage = oImage.getSubimage(iBorder, iBorder, oImage.getWidth() - (iBorder * 2), oImage.getHeight() - (iBorder * 2));
+                BufferedImage oNewImage = oImage.getSubimage(iBorder, iBorder, oImage.getWidth() - 
+                                                             (iBorder * 2), oImage.getHeight() - (iBorder * 2));
 
                 ByteArrayOutputStream oOutput = new ByteArrayOutputStream();
                 MemoryCacheImageOutputStream oImageOutput = new MemoryCacheImageOutputStream(oOutput);
