@@ -6,31 +6,18 @@ import com.truelogic.common.*;
 
 public class Main 
 {
-    private static class Source
-    {
-        String strID;
-        Vector<String> strURLs = new Vector<String>();
-        String strName;
-        int iImageWidthMin;
-        int iAspectRatioMax;
-        int iArticleSizeMin;
-//        int iArticleCountMin;
-        int iArticleChunkSizeMin;
-//        int iDepthMax;
-    }
-
-    private static String strConnect;
-    private static String strUser;
-    private static String strPassword;
-    private static String strOutputDir;
-    private static int iArticleCount;
-    private static int iImageWidth;
-    private static int iImageHeight;
-    private static int iImageQuality;
+    private String strConnect;
+    private String strUser;
+    private String strPassword;
+    private String strOutputDir;
+    private int iArticleCount;
+    private int iImageWidth;
+    private int iImageHeight;
+    private int iImageQuality;
     
-    private static Vector<Source> oSourceList = new Vector<Source>();
+    private Vector<SourceData> oSourceList = new Vector<SourceData>();
     
-    public static void loadParams() throws Exception
+    public void loadParams() throws Exception
     {
         try
         {
@@ -50,36 +37,35 @@ public class Main
 
             for (int iSourceIdx = 0; iSourceIdx < iSourceCount; iSourceIdx++)
             {
-                Source oSource = new Source();
-
-                oSource.strID = oIni.StringGet("source", "source" + (iSourceIdx + 1));
+                String strID = oIni.StringGet("source", "source" + (iSourceIdx + 1));
 
                 int iIndex = 1;
-                String strURL = oIni.StringGet(oSource.strID, "url" + iIndex, null);
+                String strURL = oIni.StringGet(strID, "url" + iIndex, null);
+                
+                Vector<String> strURLs = new Vector<String>();
                 
                 while (strURL != null)
                 {
-                    oSource.strURLs.add(strURL);
+                    strURLs.add(strURL);
 
                     iIndex++;
-                    strURL = oIni.StringGet(oSource.strID, "url" + iIndex, null);
+                    strURL = oIni.StringGet(strID, "url" + iIndex, null);
                 }
                 
-                oSource.strName = oIni.StringGet(oSource.strID, "name");
+                String strName = oIni.StringGet(strID, "name");
                 
-                oSource.iImageWidthMin = oIni.IntGet(oSource.strID, "image_width_min", 
+                int iImageWidthMin = oIni.IntGet(strID, "image_width_min", 
                                              oIni.IntGet("source_default", "image_width_min", 150));
-                oSource.iAspectRatioMax = oIni.IntGet(oSource.strID, "aspect_ratio_max", 
+                int iAspectRatioMax = oIni.IntGet(strID, "aspect_ratio_max", 
                                               oIni.IntGet("source_default", "aspect_ratio_max", 2));
-                oSource.iArticleSizeMin = oIni.IntGet(oSource.strID, "article_size_min", 
+                int iArticleSizeMin = oIni.IntGet(strID, "article_size_min", 
                                               oIni.IntGet("source_default", "article_size_min", 1000));
-                oSource.iArticleChunkSizeMin = oIni.IntGet(oSource.strID, "article_chunk_size_min", 
+                int iArticleChunkSizeMin = oIni.IntGet(strID, "article_chunk_size_min", 
                                                    oIni.IntGet("source_default", "article_chunk_size_min", 100));
-//                oSource.iDepthMax = oIni.IntGet(oSource.strID, "depth_max", 
-//                                        oIni.IntGet("source_default", "depth_max", 2));
 
-                if (oSource.strID != null)
-                    oSourceList.add(oSource);
+                if (strID != null)
+                    oSourceList.add(new SourceData(strID, strURLs, strName, iImageWidthMin, iAspectRatioMax,
+                                    iArticleSizeMin, iArticleChunkSizeMin));
             }
         }
         catch (Exception oException)
@@ -88,19 +74,19 @@ public class Main
         }
     }
     
-    public static void main(String[] args) throws Exception
+    public void run(String[] stryArgs) throws Exception
     {
         loadParams();
-        java.sql.Date oDate = null;//new java.sql.Date(110, 6, 28);
+        java.sql.Date oDate = null;
         Snarfer oSnarfer = new Snarfer();
         
-        if ((args.length == 0) || (!args[0].equalsIgnoreCase("dump")))
+        if ((stryArgs.length == 0) || (!stryArgs[0].equalsIgnoreCase("dump")))
         {
             for (int iSourceIdx = 0; iSourceIdx < oSourceList.size(); iSourceIdx++)
             {
-                Source oSource = oSourceList.get(iSourceIdx);
+                SourceData oData = oSourceList.get(iSourceIdx);
 
-                oSnarfer.sourceAdd(oSource.strID, oSource.strName, oSource.strURLs, oSource.iImageWidthMin, oSource.iAspectRatioMax, oSource.iArticleSizeMin, oSource.iArticleChunkSizeMin);
+                oSnarfer.sourceAdd(oData);
             }
 
             oSnarfer.run();
@@ -109,7 +95,14 @@ public class Main
             oDate = oSnarferToDB.run();
         }
 
-        DBToFile oDBToFile = new DBToFile(oDate, strConnect, strUser, strPassword, strOutputDir, iArticleCount, iImageWidth, iImageHeight, iImageQuality);
+        DBToFile oDBToFile = new DBToFile(oDate, strConnect, strUser, strPassword, strOutputDir, iArticleCount, 
+                                          iImageWidth, iImageHeight, iImageQuality);
         oDBToFile.run();
+    }
+    
+    public static void main(String[] stryArgs) throws Exception
+    {
+        Main oMain = new Main();
+        oMain.run(stryArgs);
     }
 }
