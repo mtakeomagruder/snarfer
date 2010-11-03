@@ -3,15 +3,13 @@ package com.truelogic.snarfer;
 import java.util.*;
 import java.net.*;
 
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
+import com.sun.syndication.feed.synd.*;
+import com.sun.syndication.io.*;
 
 public class Source
 {
-    Vector<Article> oArticleList = new Vector<Article>();
-    SourceData oData;
+    private Vector<Article> oArticleList = new Vector<Article>();
+    private SourceData oData;
     
     public Source(SourceData oData) throws Exception
     {
@@ -70,13 +68,12 @@ public class Source
         * discarded.
         ***********************************************************************/
         SyndFeedInput oFeedInput = new SyndFeedInput();
-        SyndFeed oFeed; 
             
         for (String strURL : strURLs)
         {
             try
             {
-                oFeed = oFeedInput.build(new XmlReader(new URL(strURL)));
+                SyndFeed oFeed = oFeedInput.build(new XmlReader(new URL(strURL)));
                 
                 List<SyndEntry> oEntries = (List<SyndEntry>)oFeed.getEntries();
                 
