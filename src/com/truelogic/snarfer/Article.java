@@ -7,6 +7,7 @@ import java.awt.image.*;
 import javax.imageio.*;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
+import org.apache.log4j.Logger;
 import org.htmlparser.*;
 import org.htmlparser.filters.TagNameFilter;
 import org.htmlparser.nodes.*;
@@ -15,6 +16,8 @@ import org.htmlparser.tags.*;
 
 public class Article 
 {
+    static Logger oLogger = Logger.getLogger(Article.class);
+
     private String strURL;
     private int iTier;
     private boolean bGood = false;
@@ -29,6 +32,8 @@ public class Article
     public Article(Source oSource, int iTier, String strURL, int iImageWidthMin, int iAspectRatioMax, 
                    int iArticleSizeMin, int iArticleChunkSizeMin)
     {
+        oLogger.info("Loading article: " + strURL + " (" + iTier + ")");
+        
         this.strURL = strURL;
         this.iTier = iTier;
         
@@ -45,6 +50,7 @@ public class Article
 
     private void setGood()
     {
+        oLogger.info("Article is good");
         bGood = true;
     }
     
@@ -58,7 +64,7 @@ public class Article
         return(strImageURL);
     }
 
-    public void setImageURL(String strImageURL)
+    private void setImageURL(String strImageURL)
     {
         this.strImageURL = strImageURL;
     }
@@ -118,10 +124,9 @@ public class Article
         }
         catch (Exception oException)
         {
-            logError(getURL(), oException.getClass().getName(), oException.getMessage());
+            oLogger.error(strURL, oException);
             return(isGood());
         }
-        
         
         return(isGood());
     }
@@ -130,6 +135,8 @@ public class Article
     {
         NodeList oBodyNodeList = null;
         String strText = null;
+
+        oLogger.info("Retrieving article text");
         
         try
         {
@@ -137,7 +144,7 @@ public class Article
         }
         catch (Exception oException)
         {
-            logError(getURL(), oException.getClass().getName(), oException.getMessage());
+            oLogger.error(getURL(), oException);
             return(null);
         }
         
@@ -163,7 +170,7 @@ public class Article
         }
         catch (Exception oException)
         {
-            logError(getURL(), oException.getClass().getName(), oException.getMessage());
+            oLogger.error(getURL(), oException);
             return(null);
         }
         
@@ -220,8 +227,6 @@ public class Article
 
                 if (strTemp != null)
                     strText += " " + strTemp.trim();
-                 
-                 
             }
         }
 
@@ -239,13 +244,15 @@ public class Article
         int iImageWidth = 0;
         byte[] oBuffer = null;
         
+        oLogger.info("Retrieving article image");
+
         try
         {
             oImageNodeList = oParser.extractAllNodesThatMatch (new TagNameFilter ("img"));
         }
         catch (Exception oException)
         {
-            logError(getURL(), oException.getClass().getName(), oException.getMessage());
+            oLogger.error(getURL(), oException);
             return(null);
         }
         
@@ -315,7 +322,7 @@ public class Article
             }
             catch (Exception oException)
             {
-                logError(getURL(), oException.getClass().getName(), oException.getMessage());
+                oLogger.error(getURL(), oException);
                 return(null);
             }
         }
@@ -323,10 +330,6 @@ public class Article
     return(oBuffer);
     }
 
-    private void logError(String strURL, String strExceptionType, String strExceptionText)
-    {
-    }
-    
     private static int getAttributeInt(TagNode oNode, String strAttribute)
     {
         return((new Integer(oNode.getAttribute(strAttribute))).intValue());
