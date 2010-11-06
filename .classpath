@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="lib/PostgreSQL/8.3/postgresql-8.3-605.jdbc3.jar"/>
 	<classpathentry kind="lib" path="lib/Rome/1.0/rome-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/JDom/1.1.1/jdom.jar"/>
+	<classpathentry kind="lib" path="lib/Log4J/1.2.16/log4j-1.2.16.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
