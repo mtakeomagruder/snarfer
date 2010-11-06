@@ -10,6 +10,8 @@ import com.sun.syndication.io.*;
 
 public class Source
 {
+    static Logger oLogger = Logger.getLogger(Source.class);
+    
     private SourceData oData;
     private Vector<Article> oArticles = new Vector<Article>();
     
@@ -44,12 +46,14 @@ public class Source
         * If any of these operations fail, the the URL is useless and must be
         * discarded.
         ***********************************************************************/
+        oLogger.info("Initializing RSS reader");
         SyndFeedInput oFeedInput = new SyndFeedInput();
             
         for (String strURL : strURLs)
         {
             try
             {
+                oLogger.info("Loading RSS feed: " + strURL);
                 SyndFeed oFeed = oFeedInput.build(new XmlReader(new URL(strURL)));
                 
                 List<SyndEntry> oEntries = (List<SyndEntry>)oFeed.getEntries();
@@ -58,15 +62,15 @@ public class Source
                 
                 for (SyndEntry oEntry : oEntries)
                 {
-                    /*******************************************************************
-                     * Make sure the URL has not already been found
-                     *******************************************************************/
-                     if (oArticleHash.get(oEntry.getUri()) != null)
-                         continue;
+                    /***************************************************************************************************
+                    * Make sure the URL has not already been found
+                    ***************************************************************************************************/
+                    if (oArticleHash.get(oEntry.getUri()) != null)
+                        continue;
 
                      /*******************************************************************
-                      * Attempt to retrieve the article and store it if it looks good
-                      *******************************************************************/
+                     * Attempt to retrieve the article and store it if it looks good
+                     *******************************************************************/
                       Article oArticle = new Article(this, iDepth, oEntry.getUri(), oData.getImageWidthMin(), 
                                                      oData.getAspectRatioMax(), oData.getArticleSizeMin(), 
                                                      oData.getArticleChunkSizeMin());
@@ -80,25 +84,20 @@ public class Source
                           
                           oArticleHash.put(oEntry.getUri(), oArticle);
                       }
-
-                      if (iDepth == 1)
-                          iDepth = 2;
                 }
+
+                if (iDepth == 1)
+                    iDepth = 2;
             }
             catch (Exception oException)
             {
-                logError(strURL, oException.getClass().getName(), oException.getMessage());
+                oLogger.error(strURL, oException);
             }
         }
         
         return(oArticleList);
     }
 
-    private void logError(String strURL, String strExceptionType, String strExceptionText)
-    {
-        System.out.println(strURL + ": " + strExceptionText);
-    }
-    
     public Vector<Article> getArticles()
     {
         return(oArticles);
