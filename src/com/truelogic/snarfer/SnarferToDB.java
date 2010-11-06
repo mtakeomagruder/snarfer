@@ -34,11 +34,11 @@ public class SnarferToDB
             {
                 Source oSource = oSnarfer.sourceGet(iSourceIdx);
 
-                iSourceID = storeSource(oSource.getID(), oSource.getName(), oSource.getURLs().get(0));
+                iSourceID = storeSource(oSource.getData().getID(), oSource.getData().getName(), oSource.getData().getURLs().get(0));
 
-                for (int iArticleIdx = 0; iArticleIdx < oSource.articleSize(); iArticleIdx++)
+                for (int iArticleIdx = 0; iArticleIdx < oSource.getArticles().size(); iArticleIdx++)
                 {
-                    Article oArticle = oSource.articleGet(iArticleIdx);
+                    Article oArticle = oSource.getArticles().get(iArticleIdx);
 
                     storeArticle(iBatchID, iSourceID, oArticle.getTier(), 
                                 oArticle.getText(), oArticle.getURL(), 

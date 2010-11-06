@@ -3,13 +3,15 @@ package com.truelogic.snarfer;
 import java.util.*;
 import java.net.*;
 
+import org.apache.log4j.Logger;
+
 import com.sun.syndication.feed.synd.*;
 import com.sun.syndication.io.*;
 
 public class Source
 {
-    private Vector<Article> oArticleList = new Vector<Article>();
     private SourceData oData;
+    private Vector<Article> oArticles = new Vector<Article>();
     
     public Source(SourceData oData) throws Exception
     {
@@ -19,40 +21,15 @@ public class Source
         this.oData = oData;
     }
     
-    public int articleSize()
-    {
-        return(oArticleList.size());
-    }
-    
-    public Article articleGet(int iIndex)
-    {
-        return(oArticleList.get(iIndex));
-    }
-    
-    public String getID()
-    {
-        return(oData.getID());
-    }
-
-    public String getName()
-    {
-        return(oData.getName());
-    }
-    
-    public Vector<String> getURLs()
-    {
-        return(oData.getURLs());
-    }
-
     public void run()
     {
-        oArticleList = getArticleList();
+        oArticles = getArticleList();
     }
 
     private Vector<Article> getArticleList()
     {
         Hashtable<String, Article> oArticleHash = new Hashtable<String, Article>();
-        return(getArticleList(oArticleHash, getURLs()));
+        return(getArticleList(oArticleHash, getData().getURLs()));
     }
     
     @SuppressWarnings("unchecked")
@@ -120,5 +97,15 @@ public class Source
     private void logError(String strURL, String strExceptionType, String strExceptionText)
     {
         System.out.println(strURL + ": " + strExceptionText);
+    }
+    
+    public Vector<Article> getArticles()
+    {
+        return(oArticles);
+    }
+    
+    public SourceData getData()
+    {
+        return(oData);
     }
 }
