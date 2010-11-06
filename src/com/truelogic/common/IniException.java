@@ -2,6 +2,8 @@ package com.truelogic.common;
 
 /***********************************************************************************************************************
 * Exception handler for the IniFile class.
+* 
+* @author David Steele
 ***********************************************************************************************************************/
 public class IniException extends Exception 
 {

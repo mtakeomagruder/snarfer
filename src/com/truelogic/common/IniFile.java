@@ -13,6 +13,8 @@ import java.util.*;
 * [SECTION2]
 * key1=value1
 * key2=value2
+* 
+* @author David Steele
 ***********************************************************************************************************************/
 public class IniFile
 {
