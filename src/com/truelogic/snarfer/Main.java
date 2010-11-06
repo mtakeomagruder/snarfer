@@ -2,6 +2,8 @@ package com.truelogic.snarfer;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 import com.truelogic.common.*;
 
 /***********************************************************************************************************************
@@ -30,10 +32,14 @@ import com.truelogic.common.*;
 * <p>The idea behind the snarfer is simple - create a large archive of images and articles that are time specific to be
 * used in artworks that change each day to reflect current events.  Most news organizations do not provide a consistent
 * view of what their sites looked like in the past.  The snarfer keeps a record so that we can recreate any day that
-* the snarfer ran and show how the artworks would have looked on that day</p> 
+* the snarfer ran and show how the artworks would have looked on that day</p>
+* 
+* @author David Steele
 ***********************************************************************************************************************/
 public class Main 
 {
+    static Logger oLogger = Logger.getLogger(Main.class);
+
     private String strConnect;      // A JDBC connect string for the DB
     private String strUser;         // The user name to log on as
     private String strPassword;     // The password for the user account (may be missing or blank)
@@ -55,11 +61,13 @@ public class Main
             /***********************************************************************************************************
             * Load the INI file
             ***********************************************************************************************************/
+            oLogger.info("Loading snarfer.ini");
             IniFile oIni = new IniFile("snarfer.ini");
 
             /***********************************************************************************************************
             * Load the flash output parameters 
             ***********************************************************************************************************/
+            oLogger.info("Loading general properties");
             strOutputDir = oIni.StringGet("output", "dir");
             iArticleCount = oIni.IntGet("output", "article_count", 100);
             iImageWidth = oIni.IntGet("output", "image_width", 320);
@@ -69,6 +77,7 @@ public class Main
             /***********************************************************************************************************
             * Load the DB parameters 
             ***********************************************************************************************************/
+            oLogger.info("Loading DB properties");
             strConnect = oIni.StringGet("db", "connect");
             strUser = oIni.StringGet("db", "user");
             strPassword = oIni.StringGet("db", "password", "");
@@ -76,7 +85,9 @@ public class Main
             /***********************************************************************************************************
             * Get the source count 
             ***********************************************************************************************************/
+            oLogger.info("Loading sources");
             int iSourceCount = oIni.IntGet("source", "count", 0);
+            oLogger.info(iSourceCount + " source(s) found");
 
             /***********************************************************************************************************
             * Load each source 
@@ -87,6 +98,7 @@ public class Main
                 * Get the source ID 
                 *******************************************************************************************************/
                 String strID = oIni.StringGet("source", "source" + (iSourceIdx + 1));
+                oLogger.info("Loading source " + (iSourceIdx + 1) + ": " + strID);
 
                 /*******************************************************************************************************
                  * Get the list of source RSS URLs  
@@ -103,10 +115,14 @@ public class Main
                     iIndex++;
                     strURL = oIni.StringGet(strID, "url" + iIndex, null);
                 }
+
+                oLogger.info((iIndex - 1) + " URLs found for source " + (iSourceIdx + 1));
                 
                 /*******************************************************************************************************
                 * Get the rest of the source parameters  
                 *******************************************************************************************************/
+                oLogger.info("Loading parameters for source " + (iSourceIdx + 1));
+
                 String strName = oIni.StringGet(strID, "name");
                 
                 int iImageWidthMin = oIni.IntGet(strID, "image_width_min", 
@@ -154,6 +170,8 @@ public class Main
             /***********************************************************************************************************
             * Add all news sources to the snarfer
             ***********************************************************************************************************/
+            oLogger.info("Inserting sources into the snarfer");
+            
             for (int iSourceIdx = 0; iSourceIdx < oSourceList.size(); iSourceIdx++)
             {
                 SourceData oData = oSourceList.get(iSourceIdx);
@@ -164,18 +182,21 @@ public class Main
             /***********************************************************************************************************
             * Run the snarfer
             ***********************************************************************************************************/
+            oLogger.info("Running the snarfer");
             oSnarfer.run();
 
             /***********************************************************************************************************
             * Save the snarfer data to the DB 
             ***********************************************************************************************************/
-            SnarferToDB oSnarferToDB = new SnarferToDB(oSnarfer, strConnect, strUser, strPassword);
-            oDate = oSnarferToDB.run();
+            oLogger.info("Saving snarfer data to the DB");
+//            SnarferToDB oSnarferToDB = new SnarferToDB(oSnarfer, strConnect, strUser, strPassword);
+//            oDate = oSnarferToDB.run();
         }
 
         /***************************************************************************************************************
         * Save data from the DB into files on disk
         ***************************************************************************************************************/
+        oLogger.info("Saving snarfer data to the DB");
         DBToFile oDBToFile = new DBToFile(oDate, strConnect, strUser, strPassword, strOutputDir, iArticleCount, 
                                           iImageWidth, iImageHeight, iImageQuality);
         oDBToFile.run();
@@ -188,6 +209,9 @@ public class Main
     *******************************************************************************************************************/
     public static void main(String[] stryArgs) throws Exception
     {
+        oLogger.info("------------------------------------------------------------");
+        oLogger.info("Snarfer started");
+        
         Main oMain = new Main();
         oMain.run(stryArgs);
     }
