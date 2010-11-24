@@ -36,13 +36,13 @@ public class SnarferToDB
 
                 iSourceID = storeSource(oSource.getData().getID(), oSource.getData().getName(), oSource.getData().getURLs().get(0));
 
-                for (int iArticleIdx = 0; iArticleIdx < oSource.getArticles().size(); iArticleIdx++)
+                for (int iArticleIdx = 0; iArticleIdx < oSource.size(); iArticleIdx++)
                 {
-                    Article oArticle = oSource.getArticles().get(iArticleIdx);
+                    Article oArticle = oSource.get(iArticleIdx);
 
                     storeArticle(iBatchID, iSourceID, oArticle.getTier(), 
-                                oArticle.getText(), oArticle.getURL(), 
-                                oArticle.getImage(), oArticle.getImageURL());
+                                 oArticle.getText(), oArticle.getURL(), 
+                                 oArticle.getImage(), oArticle.getImageURL());
                 }
             }
             oDB.commit();

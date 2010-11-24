@@ -8,12 +8,12 @@ import org.apache.log4j.Logger;
 import com.sun.syndication.feed.synd.*;
 import com.sun.syndication.io.*;
 
-public class Source
+public class Source extends Vector<Article>
 {
+    private static final long serialVersionUID = 1L;
     static Logger oLogger = Logger.getLogger(Source.class);
     
     private SourceData oData;
-    private Vector<Article> oArticles = new Vector<Article>();
     
     public Source(SourceData oData) throws Exception
     {
@@ -25,28 +25,21 @@ public class Source
     
     public void run()
     {
-        oArticles = getArticleList();
+        getArticleList(getData().getURLs());
     }
 
-    private Vector<Article> getArticleList()
+    @SuppressWarnings("unchecked")
+    private void getArticleList(Vector<String> strURLs)
     {
         Hashtable<String, Article> oArticleHash = new Hashtable<String, Article>();
-        return(getArticleList(oArticleHash, getData().getURLs()));
-    }
-    
-    @SuppressWarnings("unchecked")
-    private Vector<Article> getArticleList(Hashtable<String, Article> oArticleHash, 
-                                           Vector<String> strURLs)
-    {
-        Vector<Article> oArticleList = new Vector<Article>();
         int iDepth = 1;
         
         /***********************************************************************
         * Attempt to load the URL, create the parser, and create the node list.
-        * If any of these operations fail, the the URL is useless and must be
+        * If any of these operations fail, then the URL is useless and must be
         * discarded.
         ***********************************************************************/
-        oLogger.info("Initializing RSS reader");
+        oLogger.info("Initializing RSS reader: " + getData().getName());
         SyndFeedInput oFeedInput = new SyndFeedInput();
             
         for (String strURL : strURLs)
@@ -78,9 +71,9 @@ public class Source
                       if (oArticle.retrieve())
                       {
                           if (iDepth == 1)
-                              oArticleList.add(0, oArticle);
+                              add(0, oArticle);
                           else
-                              oArticleList.add(oArticle);
+                              add(oArticle);
                           
                           oArticleHash.put(oEntry.getUri(), oArticle);
                       }
@@ -94,13 +87,6 @@ public class Source
                 oLogger.error(strURL, oException);
             }
         }
-        
-        return(oArticleList);
-    }
-
-    public Vector<Article> getArticles()
-    {
-        return(oArticles);
     }
     
     public SourceData getData()
