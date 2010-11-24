@@ -1,10 +1,6 @@
 package com.truelogic.snarfer;
 
-import java.util.*;
-
-import org.apache.log4j.Logger;
-
-import com.truelogic.common.*;
+import org.apache.log4j.*;
 
 /***********************************************************************************************************************
 * <p>This class is the entry point for the program and runs the snarfer.</p>
@@ -39,114 +35,8 @@ import com.truelogic.common.*;
 public class Main 
 {
     static Logger oLogger = Logger.getLogger(Main.class);
-
-    private String strConnect;      // A JDBC connect string for the DB
-    private String strUser;         // The user name to log on as
-    private String strPassword;     // The password for the user account (may be missing or blank)
-    private String strOutputDir;    // The output directory for the flash images and text
-    private int iArticleCount;      // The number of articles to output in the flash directory
-    private int iImageWidth;        // The width of the output flash images
-    private int iImageHeight;       // The height of the output flash images
-    private int iImageQuality;      // The JPEG quality of the output flash images
     
-    private Vector<SourceData> oSourceList = new Vector<SourceData>(); // The list of news sources and RSS feeds
-    
-    /*******************************************************************************************************************
-    * Loads the snarfer parameters.
-    *******************************************************************************************************************/
-    public void loadParams() throws Exception
-    {
-        try
-        {
-            /***********************************************************************************************************
-            * Load the INI file
-            ***********************************************************************************************************/
-            oLogger.info("Loading snarfer.ini");
-            IniFile oIni = new IniFile("snarfer.ini");
-
-            /***********************************************************************************************************
-            * Load the flash output parameters 
-            ***********************************************************************************************************/
-            oLogger.info("Loading general properties");
-            strOutputDir = oIni.StringGet("output", "dir");
-            iArticleCount = oIni.IntGet("output", "article_count", 100);
-            iImageWidth = oIni.IntGet("output", "image_width", 320);
-            iImageHeight = oIni.IntGet("output", "image_height", 240);
-            iImageQuality = oIni.IntGet("output", "image_quality", 80);
-
-            /***********************************************************************************************************
-            * Load the DB parameters 
-            ***********************************************************************************************************/
-            oLogger.info("Loading DB properties");
-            strConnect = oIni.StringGet("db", "connect");
-            strUser = oIni.StringGet("db", "user");
-            strPassword = oIni.StringGet("db", "password", "");
-            
-            /***********************************************************************************************************
-            * Get the source count 
-            ***********************************************************************************************************/
-            oLogger.info("Loading sources");
-            int iSourceCount = oIni.IntGet("source", "count", 0);
-            oLogger.info(iSourceCount + " source(s) found");
-
-            /***********************************************************************************************************
-            * Load each source 
-            ***********************************************************************************************************/
-            for (int iSourceIdx = 0; iSourceIdx < iSourceCount; iSourceIdx++)
-            {
-                /*******************************************************************************************************
-                * Get the source ID 
-                *******************************************************************************************************/
-                String strID = oIni.StringGet("source", "source" + (iSourceIdx + 1));
-                oLogger.info("Loading source " + (iSourceIdx + 1) + ": " + strID);
-
-                /*******************************************************************************************************
-                 * Get the list of source RSS URLs  
-                 *******************************************************************************************************/
-                Vector<String> strURLs = new Vector<String>();
-                int iIndex = 1;
-                
-                String strURL = oIni.StringGet(strID, "url" + iIndex, null);
-                
-                while (strURL != null)
-                {
-                    strURLs.add(strURL);
-
-                    iIndex++;
-                    strURL = oIni.StringGet(strID, "url" + iIndex, null);
-                }
-
-                oLogger.info((iIndex - 1) + " URLs found for source " + (iSourceIdx + 1));
-                
-                /*******************************************************************************************************
-                * Get the rest of the source parameters  
-                *******************************************************************************************************/
-                oLogger.info("Loading parameters for source " + (iSourceIdx + 1));
-
-                String strName = oIni.StringGet(strID, "name");
-                
-                int iImageWidthMin = oIni.IntGet(strID, "image_width_min", 
-                                             oIni.IntGet("source_default", "image_width_min", 150));
-                int iAspectRatioMax = oIni.IntGet(strID, "aspect_ratio_max", 
-                                              oIni.IntGet("source_default", "aspect_ratio_max", 2));
-                int iArticleSizeMin = oIni.IntGet(strID, "article_size_min", 
-                                              oIni.IntGet("source_default", "article_size_min", 1000));
-                int iArticleChunkSizeMin = oIni.IntGet(strID, "article_chunk_size_min", 
-                                                   oIni.IntGet("source_default", "article_chunk_size_min", 100));
-
-                /*******************************************************************************************************
-                * Save the source if not null  
-                *******************************************************************************************************/
-                if (strID != null)
-                    oSourceList.add(new SourceData(strID, strURLs, strName, iImageWidthMin, iAspectRatioMax,
-                                    iArticleSizeMin, iArticleChunkSizeMin));
-            }
-        }
-        catch (Exception oException)
-        {
-            throw new Exception("Unable to read snarfer.ini");
-        }
-    }
+    Config oConfig;
     
     /*******************************************************************************************************************
     * Loads the snarfer parameters.
@@ -158,7 +48,7 @@ public class Main
         /***************************************************************************************************************
         * Load parameters and initialize the snarfer
         ***************************************************************************************************************/
-        loadParams();
+        oConfig = new Config("snarfer.ini");
         java.sql.Date oDate = new java.sql.Date(System.currentTimeMillis());
         Snarfer oSnarfer = new Snarfer();
         
@@ -172,13 +62,9 @@ public class Main
             ***********************************************************************************************************/
             oLogger.info("Inserting sources into the snarfer");
             
-            for (int iSourceIdx = 0; iSourceIdx < oSourceList.size(); iSourceIdx++)
-            {
-                SourceData oData = oSourceList.get(iSourceIdx);
-
+            for (SourceData oData : oConfig.getSourceList())
                 oSnarfer.sourceAdd(oData);
-            }
-
+            
             /***********************************************************************************************************
             * Run the snarfer
             ***********************************************************************************************************/
@@ -189,17 +75,19 @@ public class Main
             * Save the snarfer data to the DB 
             ***********************************************************************************************************/
             oLogger.info("Saving snarfer data to the DB");
-//            SnarferToDB oSnarferToDB = new SnarferToDB(oSnarfer, strConnect, strUser, strPassword);
+            SnarferToDB oSnarferToDB = new SnarferToDB(oSnarfer, oConfig.getDbConnect(), oConfig.getDbUser(), 
+                                                       oConfig.getDbPassword());
 //            oDate = oSnarferToDB.run();
         }
 
         /***************************************************************************************************************
         * Save data from the DB into files on disk
         ***************************************************************************************************************/
-        oLogger.info("Saving snarfer data to the DB");
-        DBToFile oDBToFile = new DBToFile(oDate, strConnect, strUser, strPassword, strOutputDir, iArticleCount, 
-                                          iImageWidth, iImageHeight, iImageQuality);
-        oDBToFile.run();
+        oLogger.info("Saving snarfer data to files");
+        DBToFile oDBToFile = new DBToFile(oDate, oConfig.getDbConnect(), oConfig.getDbUser(), oConfig.getDbPassword(),
+                                          oConfig.getOutputDir(), oConfig.getArticleCount(), oConfig.getImageWidth(), 
+                                          oConfig.getImageHeight(), oConfig.getImageQuality());
+//        oDBToFile.run();
     }
     
     /*******************************************************************************************************************
