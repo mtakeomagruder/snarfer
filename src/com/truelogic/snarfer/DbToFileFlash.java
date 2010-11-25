@@ -9,7 +9,8 @@ import java.awt.image.*;
 import javax.imageio.*;
 import javax.imageio.stream.*;
 
-import com.truelogic.common.FileUtil;
+// Projects imports
+import com.truelogic.common.*;
 
 public class DbToFileFlash 
 {
@@ -29,7 +30,6 @@ public class DbToFileFlash
         String strImageURL;
         byte[] tyImage;
         int iBatchID;
-//        java.util.Date oBatchDay;
     }
     
     private class Source
@@ -68,39 +68,6 @@ public class DbToFileFlash
         this.iImageQuality = iImageQuality;
     }
     
-    public String getOutputDir()
-    {
-        return(strOutputDir);
-    }
-    
-/*    private java.sql.Date getDate()
-    {
-        return(oDate);
-    }*/
-
-/*    private String getDateString()
-    {
-        Calendar oDate = Calendar.getInstance();
-        oDate.setTimeInMillis(getDate().getTime());
-        
-        return(oDate.get(Calendar.YEAR) + padInt(oDate.get(Calendar.MONTH) + 1, 2) + padInt(oDate.get(Calendar.DAY_OF_MONTH) + 1, 2));
-    }*/
-
-    private int getImageWidth()
-    {
-        return(iImageWidth);
-    }
-
-    private int getImageHeight()
-    {
-        return(iImageHeight);
-    }
-
-    private int getImageQuality()
-    {
-        return(iImageQuality);
-    }
-    
     private String padInt(int iInt, int iPad)
     {
         String strInt = "" + iInt;
@@ -117,7 +84,7 @@ public class DbToFileFlash
         Vector<Source> oSourceList = getSourceList(iBatchID);
         FileWriter oTextWriter;
 
-        String strSourceOutputDir = getOutputDir() + "00.tmp";
+        String strSourceOutputDir = strOutputDir + "00.tmp";
         FileUtil.removeDir(new File(strSourceOutputDir));
         (new File(strSourceOutputDir)).mkdir();
         strSourceOutputDir += "/flash/";
@@ -156,7 +123,7 @@ public class DbToFileFlash
                 
                 FileOutputStream oImageWriter = new FileOutputStream(strSourceOutputDir + strFileName + ".jpg");
 
-                oImageWriter.write(resizeImage(oArticle.tyImage, getImageWidth(), getImageHeight(), getImageQuality()));
+                oImageWriter.write(resizeImage(oArticle.tyImage, iImageWidth, iImageHeight, iImageQuality));
                 oImageWriter.close();
 
                 String strContent = 
@@ -192,9 +159,9 @@ public class DbToFileFlash
             }
         }
         
-        FileUtil.removeDir(new File(getOutputDir() + "00.old"));
-        (new File(getOutputDir() + "00")).renameTo(new File(getOutputDir() + "00.old"));
-        (new File(getOutputDir() + "00.tmp")).renameTo(new File(getOutputDir() + "00"));
+        FileUtil.removeDir(new File(strOutputDir + "00.old"));
+        (new File(strOutputDir + "00")).renameTo(new File(strOutputDir + "00.old"));
+        (new File(strOutputDir + "00.tmp")).renameTo(new File(strOutputDir + "00"));
     }
     
     private byte[] resizeImage(byte[] tyImage, int iWidth, int iHeight, int iQuality) throws IOException
@@ -349,7 +316,6 @@ public class DbToFileFlash
                oArticle.tyImage = oImage.toByteArray();
 
                oArticle.iBatchID = oResult.getInt("batch_id");
-//               oArticle.oBatchDay = oResult.getDate("batch_day");
                               
                oArticleList.add(oArticle);
            }
