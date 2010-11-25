@@ -9,7 +9,7 @@ import org.apache.log4j.*;
 
 // Project imports
 import com.truelogic.common.*;
-import com.truelogic.snarfer.ArticleReplace;
+import com.truelogic.snarfer.ConfigReplace;
 import com.truelogic.snarfer.exception.SnarferException;
 
 /***********************************************************************************************************************
@@ -30,7 +30,7 @@ public class Config
     private int iImageHeight;               // The height of the output flash images
     private int iImageQuality;              // The JPEG quality of the output flash images
     
-    private ArticleReplace oArticleReplace; // The replacement rules for an article
+    private ConfigReplace oArticleReplace; // The replacement rules for an article
     
     private Vector<ConfigSource> oSourceList = new Vector<ConfigSource>(); // The list of news sources and RSS feeds
     
@@ -151,7 +151,7 @@ public class Config
                 iIndex += 1;
             }
             
-            oArticleReplace = new ArticleReplace(strRules);
+            oArticleReplace = new ConfigReplace(strRules);
             
             /***********************************************************************************************************
             * Save the source if not null  
@@ -213,7 +213,7 @@ public class Config
      /******************************************************************************************************************
      * @return Default list of replacement rules for articles
      ******************************************************************************************************************/
-      public ArticleReplace getArticleReplace() 
+      public ConfigReplace getArticleReplace() 
       {
           return(oArticleReplace);
       }

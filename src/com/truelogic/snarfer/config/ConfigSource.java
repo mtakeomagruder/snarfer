@@ -3,7 +3,7 @@ package com.truelogic.snarfer.config;
 //Java imports
 import java.util.*;
 
-import com.truelogic.snarfer.ArticleReplace;
+import com.truelogic.snarfer.ConfigReplace;
 
 /***********************************************************************************************************************
 * Contains information about each news source listed in the INI file.
@@ -20,7 +20,7 @@ public class ConfigSource
     private int iArticleSizeMin;                            // Minimum size for the article text
     private int iArticleChunkSizeMin;                       // Minimum chunk size for each section of the article
     private int iBorderWidth;                               // The width of the image border to crop
-    private ArticleReplace oArticleReplace;                 // Replacement rules
+    private ConfigReplace oArticleReplace;                 // Replacement rules
     
     /*******************************************************************************************************************
     * Initializes the SourceData object.
@@ -35,7 +35,7 @@ public class ConfigSource
     * @param iBorderWidth          Width of the image border to crop 
     *******************************************************************************************************************/
     public ConfigSource(String strID, Vector<String> strURLs, String strName, int iImageWidthMin, int iAspectRatioMax,
-                      int iArticleSizeMin, int iArticleChunkSizeMin, int iBorderWidth, ArticleReplace oArticleReplace)
+                      int iArticleSizeMin, int iArticleChunkSizeMin, int iBorderWidth, ConfigReplace oArticleReplace)
     {
         this.strID = strID;
         this.strURLs = strURLs;
@@ -115,7 +115,7 @@ public class ConfigSource
     /*******************************************************************************************************************
     * @return Article replacement rules 
     *******************************************************************************************************************/
-    public ArticleReplace getArticleReplace() 
+    public ConfigReplace getArticleReplace() 
     {
         return(oArticleReplace);
     }

@@ -14,7 +14,7 @@ import au.com.bytecode.opencsv.*;
 * 
 * @author David Steele
 ***********************************************************************************************************************/
-public class ArticleReplace extends HashMap<String, String> 
+public class ConfigReplace extends HashMap<String, String> 
 {
     private static final long serialVersionUID = 1L;
     
@@ -35,7 +35,7 @@ public class ArticleReplace extends HashMap<String, String>
     * 
     * @param strRules  The CSV string that defines the rules
     *******************************************************************************************************************/
-    public ArticleReplace(String strRules) throws IOException, SnarferException
+    public ConfigReplace(String strRules) throws IOException, SnarferException
     {
         oKeys = new Vector<String>();
         CSVReader oReader = new CSVReader(new StringReader(strRules));
