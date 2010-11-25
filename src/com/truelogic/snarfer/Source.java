@@ -8,7 +8,9 @@ import java.net.*;
 import org.apache.log4j.Logger;
 import com.sun.syndication.feed.synd.*;
 import com.sun.syndication.io.*;
-import com.truelogic.snarfer.config.ConfigSource;
+
+// Project imports
+import com.truelogic.snarfer.config.*;
 
 public class Source extends Vector<Article>
 {

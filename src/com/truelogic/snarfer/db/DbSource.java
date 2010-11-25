@@ -1,7 +1,7 @@
 package com.truelogic.snarfer.db;
 
+// Java imports
 import java.util.Vector;
-
 
 public class DbSource 
 {

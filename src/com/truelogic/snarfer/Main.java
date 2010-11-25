@@ -3,8 +3,8 @@ package com.truelogic.snarfer;
 // Third party imports
 import org.apache.log4j.*;
 
-import com.truelogic.snarfer.config.Config;
-import com.truelogic.snarfer.config.ConfigSource;
+// Project imports
+import com.truelogic.snarfer.config.*;
 
 /***********************************************************************************************************************
 * <p>This class is the entry point for the program and runs the snarfer.</p>

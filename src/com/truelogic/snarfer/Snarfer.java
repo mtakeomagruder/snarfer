@@ -3,7 +3,8 @@ package com.truelogic.snarfer;
 // Java imports
 import java.util.*;
 
-import com.truelogic.snarfer.config.ConfigSource;
+// Project imports
+import com.truelogic.snarfer.config.*;
 
 public class Snarfer 
 {

@@ -4,7 +4,8 @@ package com.truelogic.snarfer;
 import java.io.*;
 import java.sql.*;
 
-import com.truelogic.snarfer.config.ConfigDb;
+// Project imports
+import com.truelogic.snarfer.config.*;
 
 public class SnarferToDb 
 {
