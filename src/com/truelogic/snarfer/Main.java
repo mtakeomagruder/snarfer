@@ -76,7 +76,7 @@ public class Main
             * Save the snarfer data to the DB 
             ***********************************************************************************************************/
             oLogger.info("Saving snarfer data to the DB");
-            SnarferToDB oSnarferToDB = new SnarferToDB(oSnarfer, oConfig.getDbConnect(), oConfig.getDbUser(), 
+            SnarferToDb oSnarferToDB = new SnarferToDb(oSnarfer, oConfig.getDbConnect(), oConfig.getDbUser(), 
                                                        oConfig.getDbPassword());
 //            oDate = oSnarferToDB.run();
         }
