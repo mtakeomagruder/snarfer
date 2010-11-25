@@ -22,14 +22,13 @@ public class DbToFileFlash
     private int iImageHeight;
     private int iImageQuality;
     
-    public DbToFileFlash(java.sql.Date oDate, String strDriver, String strConnect, String strUser, 
-                         String strPassword, String strOutputDir, int iLimit, 
+    public DbToFileFlash(java.sql.Date oDate, ConfigDb oConfigDb, String strOutputDir, int iLimit, 
                          int iImageWidth, int iImageHeight, int iImageQuality) 
                          throws ClassNotFoundException, SQLException
     {
-        Class.forName(strDriver);
+        Class.forName(oConfigDb.getDriver());
 
-        oDB = DriverManager.getConnection(strConnect, strUser, strPassword);
+        oDB = DriverManager.getConnection(oConfigDb.getConnect(), oConfigDb.getUser(), oConfigDb.getPassword());
         oDB.setAutoCommit(false);
 
         this.oDate = oDate;

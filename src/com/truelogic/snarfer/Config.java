@@ -19,12 +19,9 @@ public class Config
 {
     static Logger oLogger = Logger.getLogger(Config.class);
     
-    private String strDbDriver;             // JDBC driver
-    private String strDbConnect;            // JDBC connect string
-    private String strDbUser;               // The DB user name
-    private String strDbPassword;           // The user password (may be missing or blank)
-
     private String strOutputDir;            // The output directory for the flash images and text
+    
+    private ConfigDb oDb;                   // Database configuration
 
     private int iArticleCount;              // The number of articles to output in the flash directory
     private int iImageWidth;                // The width of the output flash images
@@ -72,10 +69,11 @@ public class Config
         * Load the DB parameters 
         ***************************************************************************************************************/
         oLogger.info("Loading DB properties");
-        strDbDriver = oIni.StringGet("db", "driver");
-        strDbConnect = oIni.StringGet("db", "connect");
-        strDbUser = oIni.StringGet("db", "user");
-        strDbPassword = oIni.StringGet("db", "password", "");
+        
+        oDb = new ConfigDb(oIni.StringGet("db", "driver"),
+                           oIni.StringGet("db", "connect"), 
+                           oIni.StringGet("db", "user"), 
+                           oIni.StringGet("db", "password", ""));
           
         /***************************************************************************************************************
         * Get the source count 
@@ -165,36 +163,11 @@ public class Config
     /******************************************************************************************************************
      * @return JDBC driver
      ******************************************************************************************************************/
-     public String getDbDriver() 
+     public ConfigDb getDb() 
      {
-         return(strDbDriver);
+         return(oDb);
      }
-
     
-     /******************************************************************************************************************
-     * @return JDBC connect string
-     ******************************************************************************************************************/
-     public String getDbConnect() 
-     {
-         return(strDbConnect);
-     }
-
-     /******************************************************************************************************************
-     * @return Database user
-     ******************************************************************************************************************/
-     public String getDbUser() 
-     {
-         return(strDbUser);
-     }
-
-     /******************************************************************************************************************
-     * @return Database user password
-     ******************************************************************************************************************/
-     public String getDbPassword() 
-     {
-         return(strDbPassword);
-     }
-
      /******************************************************************************************************************
      * @return Directory where the flash output files are written
      ******************************************************************************************************************/

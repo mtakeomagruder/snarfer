@@ -76,8 +76,7 @@ public class Main
             * Save the snarfer data to the DB 
             ***********************************************************************************************************/
             oLogger.info("Saving snarfer data to the DB");
-            SnarferToDb oSnarferToDB = new SnarferToDb(oSnarfer, oConfig.getDbDriver(), oConfig.getDbConnect(), 
-                                                       oConfig.getDbUser(), oConfig.getDbPassword());
+            SnarferToDb oSnarferToDB = new SnarferToDb(oSnarfer, oConfig.getDb());
 //            oDate = oSnarferToDB.run();
         }
 
@@ -85,11 +84,9 @@ public class Main
         * Save data from the DB into files on disk
         ***************************************************************************************************************/
         oLogger.info("Saving snarfer data to files");
-        DbToFileFlash oDBToFile = new DbToFileFlash(oDate, oConfig.getDbDriver(), oConfig.getDbConnect(), 
-                                                    oConfig.getDbUser(), oConfig.getDbPassword(), 
-                                                    oConfig.getOutputDir(), oConfig.getArticleCount(), 
-                                                    oConfig.getImageWidth(), oConfig.getImageHeight(), 
-                                                    oConfig.getImageQuality());
+        DbToFileFlash oDBToFile = new DbToFileFlash(oDate, oConfig.getDb(), oConfig.getOutputDir(), 
+                                                    oConfig.getArticleCount(), oConfig.getImageWidth(), 
+                                                    oConfig.getImageHeight(), oConfig.getImageQuality());
 //        oDBToFile.run();
     }
     
