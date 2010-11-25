@@ -129,14 +129,14 @@ public class IniFile
     }
 
     /*******************************************************************************************************************
-     * Retrieves an integer value from the INI file.
-     * 
-     * @param strSection  The section to retrieve from
-     * @param strKey      The key to retrieve from
-     * @param iDefault    A default value in case the section/key does not exist (null is OK)
-     * 
-     * @return The retrieved or default value
-     *******************************************************************************************************************/
+    * Retrieves an integer value from the INI file.
+    * 
+    * @param strSection  The section to retrieve from
+    * @param strKey      The key to retrieve from
+    * @param iDefault    A default value in case the section/key does not exist (null is OK)
+    * 
+    * @return The retrieved or default value
+    *******************************************************************************************************************/
     public Integer IntGet(String strSection, String strKey, Integer iDefault)
     {
         try
@@ -155,13 +155,13 @@ public class IniFile
     }
 
     /*******************************************************************************************************************
-     * Retrieves an integer value from the INI file.
-     * 
-     * @param strSection  The section to retrieve from
-     * @param strKey      The key to retrieve from
-     * 
-     * @return The retrieved or default value
-     *******************************************************************************************************************/
+    * Retrieves an integer value from the INI file.
+    * 
+    * @param strSection  The section to retrieve from
+    * @param strKey      The key to retrieve from
+    * 
+    * @return The retrieved or default value
+    *******************************************************************************************************************/
     public Integer IntGet(String strSection, String strKey) throws IniException
     {
         return(new Integer(StringGet(strSection, strKey)));
