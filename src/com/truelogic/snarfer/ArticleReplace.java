@@ -8,7 +8,7 @@ import java.util.*;
 import au.com.bytecode.opencsv.*;
 
 /***********************************************************************************************************************
-* <p>This class loads a set of replacement rules from a CSV string.</p>
+* This class loads a set of replacement rules from a CSV string.
 * 
 * @author David Steele
 ***********************************************************************************************************************/

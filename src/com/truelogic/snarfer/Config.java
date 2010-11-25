@@ -11,7 +11,7 @@ import org.apache.log4j.*;
 import com.truelogic.common.*;
 
 /***********************************************************************************************************************
-* <p>This class loads and parses the snarfer.ini file.</p>
+* This class loads and parses the snarfer.ini file.
 * 
 * @author David Steele
 ***********************************************************************************************************************/

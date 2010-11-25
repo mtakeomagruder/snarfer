@@ -4,7 +4,7 @@ package com.truelogic.common;
 import java.io.*;
 
 /***********************************************************************************************************************
-* <p>This class contains various file utility functions.</p>
+* This class contains various file utility functions.
 * 
 * @author David Steele
 ***********************************************************************************************************************/
