@@ -119,13 +119,15 @@ public class Config
             String strName = oIni.StringGet(strID, "name");
             
             int iImageWidthMin = oIni.IntGet(strID, "image_width_min", 
-                                         oIni.IntGet("source_default", "image_width_min", 150));
+                                             oIni.IntGet("source_default", "image_width_min", 150));
             int iAspectRatioMax = oIni.IntGet(strID, "aspect_ratio_max", 
-                                          oIni.IntGet("source_default", "aspect_ratio_max", 2));
+                                              oIni.IntGet("source_default", "aspect_ratio_max", 2));
             int iArticleSizeMin = oIni.IntGet(strID, "article_size_min", 
-                                          oIni.IntGet("source_default", "article_size_min", 1000));
+                                              oIni.IntGet("source_default", "article_size_min", 1000));
             int iArticleChunkSizeMin = oIni.IntGet(strID, "article_chunk_size_min", 
-                                               oIni.IntGet("source_default", "article_chunk_size_min", 100));
+                                                   oIni.IntGet("source_default", "article_chunk_size_min", 100));
+            int iBorderWidth = oIni.IntGet(strID, "border_width", 
+                                           oIni.IntGet("source_default", "border_width", 1));
 
             /***********************************************************************************************************
             * Read the article replacement rules  
@@ -154,7 +156,7 @@ public class Config
             ***********************************************************************************************************/
             if (strID != null)
                 oSourceList.add(new SourceData(strID, strURLs, strName, iImageWidthMin, iAspectRatioMax,
-                                iArticleSizeMin, iArticleChunkSizeMin, oArticleReplace));
+                                iArticleSizeMin, iArticleChunkSizeMin, iBorderWidth, oArticleReplace));
         }
     }
      

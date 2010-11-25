@@ -17,6 +17,7 @@ public class SourceData
     private int iAspectRatioMax;                            // Max image aspect ratio
     private int iArticleSizeMin;                            // Minimum size for the article text
     private int iArticleChunkSizeMin;                       // Minimum chunk size for each section of the article
+    private int iBorderWidth;                               // The width of the image border to crop
     private ArticleReplace oArticleReplace;                 // Replacement rules
     
     /*******************************************************************************************************************
@@ -29,9 +30,10 @@ public class SourceData
     * @param iAspectRatioMax       Max image aspect ratio
     * @param iArticleSizeMin       Minimum size for the article text
     * @param iArticleChunkSizeMin  Minimum chunk size for each section of the article
+    * @param iBorderWidth          Width of the image border to crop 
     *******************************************************************************************************************/
     public SourceData(String strID, Vector<String> strURLs, String strName, int iImageWidthMin, int iAspectRatioMax,
-                      int iArticleSizeMin, int iArticleChunkSizeMin, ArticleReplace oArticleReplace)
+                      int iArticleSizeMin, int iArticleChunkSizeMin, int iBorderWidth, ArticleReplace oArticleReplace)
     {
         this.strID = strID;
         this.strURLs = strURLs;
@@ -41,10 +43,11 @@ public class SourceData
         this.iArticleSizeMin = iArticleSizeMin;
         this.iArticleChunkSizeMin = iArticleChunkSizeMin;
         this.oArticleReplace = oArticleReplace;
+        this.iBorderWidth = iBorderWidth;
     }
 
     /*******************************************************************************************************************
-    * @return The source ID (for internal use).
+    * @return Source ID (for internal use).
     *******************************************************************************************************************/
     public String getID() 
     {
@@ -52,7 +55,7 @@ public class SourceData
     }
 
     /*******************************************************************************************************************
-    * @return The list of RSS URLs for the source.
+    * @return List of RSS URLs for the source.
     *******************************************************************************************************************/
     public Vector<String> getURLs() 
     {
@@ -60,7 +63,7 @@ public class SourceData
     }
 
     /*******************************************************************************************************************
-    * @return The source name (for display).
+    * @return Source name (for display).
     *******************************************************************************************************************/
     public String getName() 
     {
@@ -68,7 +71,7 @@ public class SourceData
     }
 
     /*******************************************************************************************************************
-    * @return The minimum article image width (or height if portrait orientation). 
+    * @return Minimum article image width (or height if portrait orientation). 
     *******************************************************************************************************************/
     public int getImageWidthMin() 
     {
@@ -76,7 +79,7 @@ public class SourceData
     }
 
     /*******************************************************************************************************************
-    * @return The maximum aspect ratio for the article image (long side / short side) 
+    * @return Maximum aspect ratio for the article image (long side / short side) 
     *******************************************************************************************************************/
     public int getAspectRatioMax() 
     {
@@ -84,7 +87,7 @@ public class SourceData
     }
 
     /*******************************************************************************************************************
-    * @return The minimum size for the article (all chunks together) 
+    * @return Minimum size for the article (all chunks together) 
     *******************************************************************************************************************/
     public int getArticleSizeMin() 
     {
@@ -98,9 +101,17 @@ public class SourceData
     {
         return(iArticleChunkSizeMin);
     }
+
+    /*******************************************************************************************************************
+    * @return Width of the image border to crop 
+    *******************************************************************************************************************/
+    public int getBorderWidth() 
+    {
+        return(iBorderWidth);
+    }
     
     /*******************************************************************************************************************
-    * @return The article replacement rules 
+    * @return Article replacement rules 
     *******************************************************************************************************************/
     public ArticleReplace getArticleReplace() 
     {
