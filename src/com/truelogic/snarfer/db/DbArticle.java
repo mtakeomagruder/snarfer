@@ -1,4 +1,4 @@
-package com.truelogic.snarfer;
+package com.truelogic.snarfer.db;
 
 public class DbArticle 
 {
