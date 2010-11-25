@@ -9,7 +9,7 @@ import java.awt.image.*;
 import javax.imageio.*;
 import javax.imageio.stream.*;
 
-public class DBToFile 
+public class DbToFileFlash 
 {
     private class Article
     {
@@ -48,7 +48,7 @@ public class DBToFile
     private int iImageHeight;
     private int iImageQuality;
     
-    public DBToFile(java.sql.Date oDate, String strConnect, String strUser, 
+    public DbToFileFlash(java.sql.Date oDate, String strConnect, String strUser, 
                     String strPassword, String strOutputDir, int iLimit, 
                     int iImageWidth, int iImageHeight, int iImageQuality) 
                     throws ClassNotFoundException, SQLException

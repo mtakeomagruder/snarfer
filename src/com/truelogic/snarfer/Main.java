@@ -85,7 +85,7 @@ public class Main
         * Save data from the DB into files on disk
         ***************************************************************************************************************/
         oLogger.info("Saving snarfer data to files");
-        DBToFile oDBToFile = new DBToFile(oDate, oConfig.getDbConnect(), oConfig.getDbUser(), oConfig.getDbPassword(),
+        DbToFileFlash oDBToFile = new DbToFileFlash(oDate, oConfig.getDbConnect(), oConfig.getDbUser(), oConfig.getDbPassword(),
                                           oConfig.getOutputDir(), oConfig.getArticleCount(), oConfig.getImageWidth(), 
                                           oConfig.getImageHeight(), oConfig.getImageQuality());
 //        oDBToFile.run();
