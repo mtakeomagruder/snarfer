@@ -4,12 +4,12 @@ package com.truelogic.snarfer;
 import java.io.*;
 import java.sql.*;
 
-public class SnarferToDB 
+public class SnarferToDb 
 {
     private Connection oDB = null;
     private Snarfer oSnarfer = null;
     
-    public SnarferToDB(Snarfer oSnarfer, String strConnect, String strUser, String strPassword) throws ClassNotFoundException, SQLException
+    public SnarferToDb(Snarfer oSnarfer, String strConnect, String strUser, String strPassword) throws ClassNotFoundException, SQLException
     {
         Class.forName("org.postgresql.Driver");
 
