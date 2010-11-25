@@ -167,7 +167,7 @@ public class Article
         /***************************************************************************************************************
         * If the article does not look valid then return error 
         ***************************************************************************************************************/
-        if ((strText != null) && (strText.length() < oSource.getData().getArticleSizeMin()))
+        if ((strText != null) && (strText.length() < oSource.getConfig().getArticleSizeMin()))
             strText = null;
             
         /***************************************************************************************************************
@@ -236,8 +236,8 @@ public class Article
                 /*******************************************************************************************************
                 * Replace all strings defined in the rules   
                 *******************************************************************************************************/
-                for (String strReplace : oSource.getData().getArticleReplace().getOrderedKeys())
-                    strTemp = strTemp.replaceAll(strReplace, oSource.getData().getArticleReplace().get(strReplace));
+                for (String strReplace : oSource.getConfig().getArticleReplace().getOrderedKeys())
+                    strTemp = strTemp.replaceAll(strReplace, oSource.getConfig().getArticleReplace().get(strReplace));
 
                 strTemp = strTemp.trim();
                 
@@ -247,7 +247,7 @@ public class Article
                 while (strTemp.indexOf("  ") != -1)
                     strTemp = strTemp.replaceAll("  ", " ");
 
-                if (strTemp.length() < oSource.getData().getArticleChunkSizeMin())
+                if (strTemp.length() < oSource.getConfig().getArticleChunkSizeMin())
                     return(null);
             }
 
@@ -350,7 +350,7 @@ public class Article
             /***********************************************************************************************************
             * Skip this image if the width does not meet the minumum 
             ***********************************************************************************************************/
-            if (iWidth < oSource.getData().getImageWidthMin())
+            if (iWidth < oSource.getConfig().getImageWidthMin())
                 continue;
 
             /***********************************************************************************************************
@@ -364,7 +364,7 @@ public class Article
             ***********************************************************************************************************/
             iAspectRatio = (float)iWidth / (float)iHeight;
 
-            if ((iAspectRatio > oSource.getData().getAspectRatioMax()) || (iAspectRatio < 1))
+            if ((iAspectRatio > oSource.getConfig().getAspectRatioMax()) || (iAspectRatio < 1))
                 continue;
 
             /***********************************************************************************************************
@@ -401,12 +401,12 @@ public class Article
                 * Strip the border 
                 *******************************************************************************************************/
                 BufferedImage oImage = ImageIO.read(oInput);
-                BufferedImage oNewImage = oImage.getSubimage(oSource.getData().getAspectRatioMax(), 
-                                                             oSource.getData().getAspectRatioMax(), 
+                BufferedImage oNewImage = oImage.getSubimage(oSource.getConfig().getAspectRatioMax(), 
+                                                             oSource.getConfig().getAspectRatioMax(), 
                                                              oImage.getWidth() - 
-                                                             (oSource.getData().getAspectRatioMax() * 2), 
+                                                             (oSource.getConfig().getAspectRatioMax() * 2), 
                                                              oImage.getHeight() - 
-                                                             (oSource.getData().getAspectRatioMax() * 2));
+                                                             (oSource.getConfig().getAspectRatioMax() * 2));
 
                 /*******************************************************************************************************
                 * Convert the image to JPEG 

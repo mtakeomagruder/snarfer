@@ -29,9 +29,9 @@ public class Config
     private int iImageHeight;               // The height of the output flash images
     private int iImageQuality;              // The JPEG quality of the output flash images
     
-    private ConfigReplace oArticleReplace; // The replacement rules for an article
+    private ConfigReplace oConfigReplace;   // The replacement rules for an article
     
-    private Vector<ConfigSource> oSourceList = new Vector<ConfigSource>(); // The list of news sources and RSS feeds
+    private Vector<ConfigSource> oConfigSources = new Vector<ConfigSource>(); // The list of news sources and RSS feeds
     
     /*******************************************************************************************************************
     * Initalizes the snarfer config.
@@ -150,14 +150,14 @@ public class Config
                 iIndex += 1;
             }
             
-            oArticleReplace = new ConfigReplace(strRules);
+            oConfigReplace = new ConfigReplace(strRules);
             
             /***********************************************************************************************************
             * Save the source if not null  
             ***********************************************************************************************************/
             if (strID != null)
-                oSourceList.add(new ConfigSource(strID, strURLs, strName, iImageWidthMin, iAspectRatioMax,
-                                iArticleSizeMin, iArticleChunkSizeMin, iBorderWidth, oArticleReplace));
+                oConfigSources.add(new ConfigSource(strID, strURLs, strName, iImageWidthMin, iAspectRatioMax,
+                                   iArticleSizeMin, iArticleChunkSizeMin, iBorderWidth, oConfigReplace));
         }
     }
      
@@ -214,14 +214,14 @@ public class Config
      ******************************************************************************************************************/
       public ConfigReplace getArticleReplace() 
       {
-          return(oArticleReplace);
+          return(oConfigReplace);
       }
 
      /******************************************************************************************************************
      * @return List of news sources that will be scanned for valid articles
      ******************************************************************************************************************/
-     public Vector<ConfigSource> getSourceList() 
+     public Vector<ConfigSource> getSources() 
      {
-         return(oSourceList);
+         return(oConfigSources);
      }
 }

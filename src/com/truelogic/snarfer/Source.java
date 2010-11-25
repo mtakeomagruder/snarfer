@@ -17,19 +17,19 @@ public class Source extends Vector<Article>
     private static final long serialVersionUID = 1L;
     static Logger oLogger = Logger.getLogger(Source.class);
     
-    private ConfigSource oData;
+    private ConfigSource oConfig;
     
-    public Source(ConfigSource oData) throws Exception
+    public Source(ConfigSource oConfig) throws Exception
     {
-        if (oData.getID() == null || oData.getURLs() == null || oData.getURLs().size() == 0)
+        if (oConfig.getID() == null || oConfig.getURLs() == null || oConfig.getURLs().size() == 0)
             throw new Exception("strID and strURL must be set");
         
-        this.oData = oData;
+        this.oConfig = oConfig;
     }
     
     public void run()
     {
-        getArticleList(getData().getURLs());
+        getArticleList(getConfig().getURLs());
     }
 
     @SuppressWarnings("unchecked")
@@ -43,7 +43,7 @@ public class Source extends Vector<Article>
         * If any of these operations fail, then the URL is useless and must be
         * discarded.
         ***********************************************************************/
-        oLogger.info("Initializing RSS reader: " + getData().getName());
+        oLogger.info("Initializing RSS reader: " + getConfig().getName());
         SyndFeedInput oFeedInput = new SyndFeedInput();
             
         for (String strURL : strURLs)
@@ -91,8 +91,8 @@ public class Source extends Vector<Article>
         }
     }
     
-    public ConfigSource getData()
+    public ConfigSource getConfig()
     {
-        return(oData);
+        return(oConfig);
     }
 }

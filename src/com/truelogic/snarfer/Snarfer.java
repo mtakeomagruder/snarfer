@@ -10,9 +10,9 @@ public class Snarfer
 {
     Vector<Source> oSourceList = new Vector<Source>();
     
-    public void sourceAdd(ConfigSource oData) throws Exception
+    public void sourceAdd(ConfigSource oConfig) throws Exception
     {
-        Source oSource = new Source(oData);
+        Source oSource = new Source(oConfig);
         oSourceList.add(oSource);
     }
     
