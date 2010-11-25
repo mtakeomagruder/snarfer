@@ -1,10 +1,11 @@
 package com.truelogic.snarfer;
 
+// Java imports
 import java.util.*;
 import java.net.*;
 
+// Third party imports
 import org.apache.log4j.Logger;
-
 import com.sun.syndication.feed.synd.*;
 import com.sun.syndication.io.*;
 

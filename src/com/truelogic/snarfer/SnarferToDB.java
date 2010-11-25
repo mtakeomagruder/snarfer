@@ -1,5 +1,6 @@
 package com.truelogic.snarfer;
 
+// Java imports
 import java.io.*;
 import java.sql.*;
 

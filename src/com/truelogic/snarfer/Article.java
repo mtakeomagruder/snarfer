@@ -1,15 +1,17 @@
 package com.truelogic.snarfer;
 
+// Java imports
 import java.util.*;
 import java.net.*;
 import java.io.*;
 import java.awt.image.*;
 import javax.imageio.*;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
+import javax.imageio.stream.*;
 
-import org.apache.log4j.Logger;
+// Third Party imports
+import org.apache.log4j.*;
 import org.htmlparser.*;
-import org.htmlparser.filters.TagNameFilter;
+import org.htmlparser.filters.*;
 import org.htmlparser.nodes.*;
 import org.htmlparser.util.*;
 import org.htmlparser.tags.*;
