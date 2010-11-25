@@ -48,12 +48,12 @@ public class DbToFileFlash
     private int iImageHeight;
     private int iImageQuality;
     
-    public DbToFileFlash(java.sql.Date oDate, String strConnect, String strUser, 
-                    String strPassword, String strOutputDir, int iLimit, 
-                    int iImageWidth, int iImageHeight, int iImageQuality) 
-                    throws ClassNotFoundException, SQLException
+    public DbToFileFlash(java.sql.Date oDate, String strDriver, String strConnect, String strUser, 
+                         String strPassword, String strOutputDir, int iLimit, 
+                         int iImageWidth, int iImageHeight, int iImageQuality) 
+                         throws ClassNotFoundException, SQLException
     {
-        Class.forName("org.postgresql.Driver");
+        Class.forName(strDriver);
 
         oDB = DriverManager.getConnection(strConnect, strUser, strPassword);
         oDB.setAutoCommit(false);

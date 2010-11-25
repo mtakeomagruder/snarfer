@@ -9,9 +9,9 @@ public class SnarferToDb
     private Connection oDB = null;
     private Snarfer oSnarfer = null;
     
-    public SnarferToDb(Snarfer oSnarfer, String strConnect, String strUser, String strPassword) throws ClassNotFoundException, SQLException
+    public SnarferToDb(Snarfer oSnarfer, String strDriver, String strConnect, String strUser, String strPassword) throws ClassNotFoundException, SQLException
     {
-        Class.forName("org.postgresql.Driver");
+        Class.forName(strDriver);
 
         oDB = DriverManager.getConnection(strConnect, strUser, strPassword);
         oDB.setAutoCommit(false);

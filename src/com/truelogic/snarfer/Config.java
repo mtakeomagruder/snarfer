@@ -19,9 +19,10 @@ public class Config
 {
     static Logger oLogger = Logger.getLogger(Config.class);
     
-    private String strDbConnect;            // A JDBC connect string for the DB
-    private String strDbUser;               // The user name to log on as
-    private String strDbPassword;           // The password for the user account (may be missing or blank)
+    private String strDbDriver;             // JDBC driver
+    private String strDbConnect;            // JDBC connect string
+    private String strDbUser;               // The DB user name
+    private String strDbPassword;           // The user password (may be missing or blank)
 
     private String strOutputDir;            // The output directory for the flash images and text
 
@@ -71,6 +72,7 @@ public class Config
         * Load the DB parameters 
         ***************************************************************************************************************/
         oLogger.info("Loading DB properties");
+        strDbDriver = oIni.StringGet("db", "driver");
         strDbConnect = oIni.StringGet("db", "connect");
         strDbUser = oIni.StringGet("db", "user");
         strDbPassword = oIni.StringGet("db", "password", "");
@@ -160,8 +162,17 @@ public class Config
         }
     }
      
+    /******************************************************************************************************************
+     * @return JDBC driver
+     ******************************************************************************************************************/
+     public String getDbDriver() 
+     {
+         return(strDbDriver);
+     }
+
+    
      /******************************************************************************************************************
-     * @return The JDBC connect string
+     * @return JDBC connect string
      ******************************************************************************************************************/
      public String getDbConnect() 
      {
@@ -169,7 +180,7 @@ public class Config
      }
 
      /******************************************************************************************************************
-     * @return The database user
+     * @return Database user
      ******************************************************************************************************************/
      public String getDbUser() 
      {
@@ -177,7 +188,7 @@ public class Config
      }
 
      /******************************************************************************************************************
-     * @return The database user password
+     * @return Database user password
      ******************************************************************************************************************/
      public String getDbPassword() 
      {
@@ -185,7 +196,7 @@ public class Config
      }
 
      /******************************************************************************************************************
-     * @return The directory where the flash output files are written
+     * @return Directory where the flash output files are written
      ******************************************************************************************************************/
      public String getOutputDir() 
      {
@@ -193,7 +204,7 @@ public class Config
      }
 
      /******************************************************************************************************************
-     * @return The maximum number of articles that will be written to the flash directory
+     * @return Maximum number of articles that will be written to the flash directory
      ******************************************************************************************************************/
      public int getArticleCount() 
      {
@@ -201,7 +212,7 @@ public class Config
      }
 
      /******************************************************************************************************************
-     * @return The width of the images that will be written to the flash directory
+     * @return Width of the images that will be written to the flash directory
      ******************************************************************************************************************/
      public int getImageWidth() 
      {
@@ -209,7 +220,7 @@ public class Config
      }
 
      /******************************************************************************************************************
-     * @return The height of the images that will be written to the flash directory
+     * @return Height of the images that will be written to the flash directory
      ******************************************************************************************************************/
      public int getImageHeight() 
      {
@@ -217,7 +228,7 @@ public class Config
      }
 
      /******************************************************************************************************************
-     * @return The JPEG quality (0-100) of the images that will be written to the flash directory
+     * @return JPEG quality (0-100) of the images that will be written to the flash directory
      ******************************************************************************************************************/
      public int getImageQuality() 
      {
@@ -225,15 +236,15 @@ public class Config
      }
 
      /******************************************************************************************************************
-      * @return The default list of replacement rules for articles
-      ******************************************************************************************************************/
+     * @return Default list of replacement rules for articles
+     ******************************************************************************************************************/
       public ArticleReplace getArticleReplace() 
       {
           return(oArticleReplace);
       }
 
-      /******************************************************************************************************************
-     * @return The list of news sources that will be scanned for valid articles
+     /******************************************************************************************************************
+     * @return List of news sources that will be scanned for valid articles
      ******************************************************************************************************************/
      public Vector<SourceData> getSourceList() 
      {
