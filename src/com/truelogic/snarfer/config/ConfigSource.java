@@ -1,9 +1,7 @@
 package com.truelogic.snarfer.config;
 
-//Java imports
+// Java imports
 import java.util.*;
-
-import com.truelogic.snarfer.ConfigReplace;
 
 /***********************************************************************************************************************
 * Contains information about each news source listed in the INI file.

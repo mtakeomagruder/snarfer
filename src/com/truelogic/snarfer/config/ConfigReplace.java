@@ -1,4 +1,4 @@
-package com.truelogic.snarfer;
+package com.truelogic.snarfer.config;
 
 // Java imports
 import java.io.*;
