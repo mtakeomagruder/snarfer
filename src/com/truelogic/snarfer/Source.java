@@ -8,15 +8,16 @@ import java.net.*;
 import org.apache.log4j.Logger;
 import com.sun.syndication.feed.synd.*;
 import com.sun.syndication.io.*;
+import com.truelogic.snarfer.config.ConfigSource;
 
 public class Source extends Vector<Article>
 {
     private static final long serialVersionUID = 1L;
     static Logger oLogger = Logger.getLogger(Source.class);
     
-    private SourceData oData;
+    private ConfigSource oData;
     
-    public Source(SourceData oData) throws Exception
+    public Source(ConfigSource oData) throws Exception
     {
         if (oData.getID() == null || oData.getURLs() == null || oData.getURLs().size() == 0)
             throw new Exception("strID and strURL must be set");
@@ -88,7 +89,7 @@ public class Source extends Vector<Article>
         }
     }
     
-    public SourceData getData()
+    public ConfigSource getData()
     {
         return(oData);
     }

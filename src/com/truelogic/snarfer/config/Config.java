@@ -1,4 +1,4 @@
-package com.truelogic.snarfer;
+package com.truelogic.snarfer.config;
 
 // Java imports
 import java.io.*;
@@ -9,6 +9,8 @@ import org.apache.log4j.*;
 
 // Project imports
 import com.truelogic.common.*;
+import com.truelogic.snarfer.ArticleReplace;
+import com.truelogic.snarfer.SnarferException;
 
 /***********************************************************************************************************************
 * This class loads and parses the snarfer.ini file.
@@ -30,7 +32,7 @@ public class Config
     
     private ArticleReplace oArticleReplace; // The replacement rules for an article
     
-    private Vector<SourceData> oSourceList = new Vector<SourceData>(); // The list of news sources and RSS feeds
+    private Vector<ConfigSource> oSourceList = new Vector<ConfigSource>(); // The list of news sources and RSS feeds
     
     /*******************************************************************************************************************
     * Initalizes the snarfer config.
@@ -155,7 +157,7 @@ public class Config
             * Save the source if not null  
             ***********************************************************************************************************/
             if (strID != null)
-                oSourceList.add(new SourceData(strID, strURLs, strName, iImageWidthMin, iAspectRatioMax,
+                oSourceList.add(new ConfigSource(strID, strURLs, strName, iImageWidthMin, iAspectRatioMax,
                                 iArticleSizeMin, iArticleChunkSizeMin, iBorderWidth, oArticleReplace));
         }
     }
@@ -219,7 +221,7 @@ public class Config
      /******************************************************************************************************************
      * @return List of news sources that will be scanned for valid articles
      ******************************************************************************************************************/
-     public Vector<SourceData> getSourceList() 
+     public Vector<ConfigSource> getSourceList() 
      {
          return(oSourceList);
      }

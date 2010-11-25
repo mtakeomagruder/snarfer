@@ -4,6 +4,8 @@ package com.truelogic.snarfer;
 import java.io.*;
 import java.sql.*;
 
+import com.truelogic.snarfer.config.ConfigDb;
+
 public class SnarferToDb 
 {
     private Connection oDB = null;

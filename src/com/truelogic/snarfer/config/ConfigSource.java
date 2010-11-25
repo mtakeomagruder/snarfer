@@ -1,14 +1,16 @@
-package com.truelogic.snarfer;
+package com.truelogic.snarfer.config;
 
 //Java imports
 import java.util.*;
+
+import com.truelogic.snarfer.ArticleReplace;
 
 /***********************************************************************************************************************
 * Contains information about each news source listed in the INI file.
 * 
 * @author David Steele
 ***********************************************************************************************************************/
-public class SourceData 
+public class ConfigSource 
 {
     private String strID;                                   // The source ID (short text string)
     private Vector<String> strURLs = new Vector<String>();  // URLs for the RSS feeds
@@ -32,7 +34,7 @@ public class SourceData
     * @param iArticleChunkSizeMin  Minimum chunk size for each section of the article
     * @param iBorderWidth          Width of the image border to crop 
     *******************************************************************************************************************/
-    public SourceData(String strID, Vector<String> strURLs, String strName, int iImageWidthMin, int iAspectRatioMax,
+    public ConfigSource(String strID, Vector<String> strURLs, String strName, int iImageWidthMin, int iAspectRatioMax,
                       int iArticleSizeMin, int iArticleChunkSizeMin, int iBorderWidth, ArticleReplace oArticleReplace)
     {
         this.strID = strID;

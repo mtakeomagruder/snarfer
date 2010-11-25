@@ -3,11 +3,13 @@ package com.truelogic.snarfer;
 // Java imports
 import java.util.*;
 
+import com.truelogic.snarfer.config.ConfigSource;
+
 public class Snarfer 
 {
     Vector<Source> oSourceList = new Vector<Source>();
     
-    public void sourceAdd(SourceData oData) throws Exception
+    public void sourceAdd(ConfigSource oData) throws Exception
     {
         Source oSource = new Source(oData);
         oSourceList.add(oSource);

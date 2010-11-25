@@ -11,6 +11,7 @@ import javax.imageio.stream.*;
 
 // Projects imports
 import com.truelogic.common.*;
+import com.truelogic.snarfer.config.ConfigDb;
 
 public class DbToFileFlash 
 {

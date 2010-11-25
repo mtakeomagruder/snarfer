@@ -3,6 +3,9 @@ package com.truelogic.snarfer;
 // Third party imports
 import org.apache.log4j.*;
 
+import com.truelogic.snarfer.config.Config;
+import com.truelogic.snarfer.config.ConfigSource;
+
 /***********************************************************************************************************************
 * <p>This class is the entry point for the program and runs the snarfer.</p>
 * 
@@ -63,7 +66,7 @@ public class Main
             ***********************************************************************************************************/
             oLogger.info("Inserting sources into the snarfer");
             
-            for (SourceData oData : oConfig.getSourceList())
+            for (ConfigSource oData : oConfig.getSourceList())
                 oSnarfer.sourceAdd(oData);
             
             /***********************************************************************************************************
