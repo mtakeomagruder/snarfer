@@ -9,6 +9,8 @@ import java.awt.image.*;
 import javax.imageio.*;
 import javax.imageio.stream.*;
 
+import com.truelogic.common.FileUtil;
+
 public class DbToFileFlash 
 {
     private class Article
@@ -116,7 +118,7 @@ public class DbToFileFlash
         FileWriter oTextWriter;
 
         String strSourceOutputDir = getOutputDir() + "00.tmp";
-        removeDir(new File(strSourceOutputDir));
+        FileUtil.removeDir(new File(strSourceOutputDir));
         (new File(strSourceOutputDir)).mkdir();
         strSourceOutputDir += "/flash/";
         (new File(strSourceOutputDir)).mkdir();
@@ -190,7 +192,7 @@ public class DbToFileFlash
             }
         }
         
-        removeDir(new File(getOutputDir() + "00.old"));
+        FileUtil.removeDir(new File(getOutputDir() + "00.old"));
         (new File(getOutputDir() + "00")).renameTo(new File(getOutputDir() + "00.old"));
         (new File(getOutputDir() + "00.tmp")).renameTo(new File(getOutputDir() + "00"));
     }
@@ -359,29 +361,4 @@ public class DbToFileFlash
         
     return(oArticleList);
     }
-     
-    
-    public void removeDir (File fIn)
-    {
-      int i;
-      File f;
-      String[] as;
-
-      if (fIn.isDirectory ())      
-        {
-        as = fIn.list ();          
-
-        for (i = 0; i < as.length; i++)
-          {                        
-          f = new File (fIn, as[i]);
-          removeDir (f);            
-          }
-
-        fIn.delete (); 
-        return;
-        }
-
-      fIn.delete ();                           
-      return;
-    }    
 }        
