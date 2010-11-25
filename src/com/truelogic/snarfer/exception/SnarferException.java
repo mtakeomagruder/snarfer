@@ -1,4 +1,4 @@
-package com.truelogic.snarfer;
+package com.truelogic.snarfer.exception;
 
 /***********************************************************************************************************************
 * Exception handler for the Snarfer project.

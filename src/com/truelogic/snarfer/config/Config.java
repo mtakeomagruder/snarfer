@@ -10,7 +10,7 @@ import org.apache.log4j.*;
 // Project imports
 import com.truelogic.common.*;
 import com.truelogic.snarfer.ArticleReplace;
-import com.truelogic.snarfer.SnarferException;
+import com.truelogic.snarfer.exception.SnarferException;
 
 /***********************************************************************************************************************
 * This class loads and parses the snarfer.ini file.

@@ -4,6 +4,8 @@ package com.truelogic.snarfer;
 import java.io.*;
 import java.util.*;
 
+import com.truelogic.snarfer.exception.SnarferException;
+
 // Third party imports
 import au.com.bytecode.opencsv.*;
 
