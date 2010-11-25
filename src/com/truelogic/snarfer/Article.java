@@ -16,103 +16,87 @@ import org.htmlparser.nodes.*;
 import org.htmlparser.util.*;
 import org.htmlparser.tags.*;
 
+/***********************************************************************************************************************
+* <p>This class attempts to parse an article from a URL.</p>
+* 
+* <p>News sites format articles in a variety of ways.  There are four major parameters (from the Source object) input 
+* to this function to help identify real news article:</p>
+* 
+* <ul>
+* <li>ImageWidthMin - Real articles generally have a decent sized image associated with them.  Since the purpose of the
+* snarfer is to get articles <b>and</b> images at least one image of specified size must be found</li>
+* <li>AspectRatioMax - Advertisements tend to be very long or very tall.  This parameter specifies the maximum ratio of
+* the longest side / the shortest side to eliminate obvious ad images.</li>
+* <li>ArticleChunkSizeMin - Articles are often broken into individual DIVs (often by paragrah).  This parameter
+* specifies the minimum size that will be included in the article.  This tends to eliminate section headers and other
+* cruft.</li>
+* </li>ArticleSizeMin - When all the chunks have been combined the article must be of a certain length to be considered
+* valid.</li>
+* </ul>
+* 
+* <p>These parameters may be set to make either images or text irrelevant if that is the desired effect.</p>
+* 
+* @author David Steele
+***********************************************************************************************************************/
 public class Article 
 {
     static Logger oLogger = Logger.getLogger(Article.class);
 
-    private String strURL;
-    private int iTier;
-    private boolean bGood = false;
-    private int iImageWidthMin;
-    private int iAspectRatioMax;
-    private int iArticleChunkSizeMin;
-    private int iArticleSizeMin;
-    private byte[] oImageBuffer = null;
-    private String strText = null;
-    private String strImageURL = null;
-    private ArticleReplace oReplace;
+    private Source oSource;                 // The source news feed
+    private String strURL;                  // The article URL
+    private int iTier;                      // 1 if the first RSS feed, 2 otherwise
+
+    private boolean bGood = false;          // Is the article good - were all text/image requirements met?
+    private byte[] oImageBuffer = null;     // Byte array containing the raw image article
+    private String strImageURL = null;      // The image URL
+    private String strText = null;          // The article text
     
-    public Article(Source oSource, int iTier, String strURL, int iImageWidthMin, int iAspectRatioMax, 
-                   int iArticleSizeMin, int iArticleChunkSizeMin, ArticleReplace oReplace)
+    /*******************************************************************************************************************
+    * Initalizes the article object.
+    * 
+    * @param oSource  The news source object
+    * @param iTier    The tier (1 is top level, 2 or greater for all else)
+    * @param strURL   The article URL
+    *******************************************************************************************************************/
+    public Article(Source oSource, int iTier, String strURL)
     {
         oLogger.info("Loading article: " + strURL + " (" + iTier + ")");
+
+        this.oSource = oSource;
         
         this.strURL = strURL;
         this.iTier = iTier;
-        
-        this.iImageWidthMin = iImageWidthMin;
-        this.iAspectRatioMax = iAspectRatioMax;
-        this.iArticleSizeMin = iArticleSizeMin;
-        this.iArticleChunkSizeMin = iArticleChunkSizeMin;
-        
-        this.oReplace = oReplace;
     }
     
-    public boolean isGood()
-    {
-        return(bGood);
-    }
-
+    /*******************************************************************************************************************
+    * Marks this article as having a valid image and text.
+    *******************************************************************************************************************/
     private void setGood()
     {
         oLogger.info("Article is good");
         bGood = true;
     }
     
-    public String getURL()
-    {
-        return(strURL);
-    }
-
-    public String getImageURL()
-    {
-        return(strImageURL);
-    }
-
-    private void setImageURL(String strImageURL)
-    {
-        this.strImageURL = strImageURL;
-    }
-
-    public String getText()
-    {
-        return(strText);
-    }
-    
-    public byte[] getImage()
-    {
-        return(oImageBuffer);
-    }
-    
-    public int getTier()
-    {
-        return(iTier);
-    }
-
-    public int getImageWidthMin()
-    {
-        return(iImageWidthMin);
-    }
-
-    public int getArticleChunkSizeMin()
-    {
-        return(iArticleChunkSizeMin);
-    }
-
-    public int getArticleSizeMin()
-    {
-        return(iArticleSizeMin);
-    }
-
+    /*******************************************************************************************************************
+    * Marks this article as having a valid image and text.
+    * 
+    * @return Is the article valid?
+    *******************************************************************************************************************/
     public boolean retrieve()
     {
         org.htmlparser.Parser oParser;
         
         try
         {
+            /***********************************************************************************************************
+            * Parse the article HTML
+            ***********************************************************************************************************/
             URL oURL = new URL(strURL);
             oParser = new org.htmlparser.Parser(oURL.openConnection());
             
+            /***********************************************************************************************************
+            * Attempt to retrieve the image
+            ***********************************************************************************************************/
             oImageBuffer = retrieveImage(oParser);
             
             if (oImageBuffer == null)
@@ -120,6 +104,9 @@ public class Article
             
             oParser.reset();
             
+            /***********************************************************************************************************
+            * Attempt to retrieve the text
+            ***********************************************************************************************************/
             strText = retrieveText(oParser);
             
             if (strText == null)
@@ -133,9 +120,19 @@ public class Article
             return(isGood());
         }
         
+        /***************************************************************************************************************
+        * At this point the article should be valid
+        ***************************************************************************************************************/
         return(isGood());
     }
 
+    /*******************************************************************************************************************
+    * Retrieves the article body element.
+    * 
+    * @param oParser A parsed representation of the HTML page
+    * 
+    * @return The article text if it is valid, null otherwise
+    *******************************************************************************************************************/
     private String retrieveText(org.htmlparser.Parser oParser)
     {
         NodeList oBodyNodeList = null;
@@ -143,6 +140,9 @@ public class Article
 
         oLogger.info("Retrieving article text");
         
+        /***************************************************************************************************************
+        * Search for the BODY element
+        ***************************************************************************************************************/
         try
         {
             oBodyNodeList = oParser.extractAllNodesThatMatch(new TagNameFilter("body"));
@@ -153,22 +153,44 @@ public class Article
             return(null);
         }
         
+        /***************************************************************************************************************
+        * If no body element then return error
+        ***************************************************************************************************************/
         if (oBodyNodeList.size() != 1)
             return(null);
         
+        /***************************************************************************************************************
+        * Search the BODY element for a valid article 
+        ***************************************************************************************************************/
         strText = retrieveText(1, oBodyNodeList.elementAt(0));
 
-        if ((strText != null) && (strText.length() < getArticleSizeMin()))
+        /***************************************************************************************************************
+        * If the article does not look valid then return error 
+        ***************************************************************************************************************/
+        if ((strText != null) && (strText.length() < oSource.getData().getArticleSizeMin()))
             strText = null;
             
+        /***************************************************************************************************************
+        * Return the valid article 
+        ***************************************************************************************************************/
         return(strText);
     }
     
+    /*******************************************************************************************************************
+    * Retrieves the article from the body element.
+    * 
+    * @param oParser A parsed representation of the BODY element
+    * 
+    * @return The article text if it is valid, null otherwise
+    *******************************************************************************************************************/
     private String retrieveText(int iDepth, Node oTextNode)
     {
         NodeList oTextNodeList = null;
         String strText = "";
         
+        /***************************************************************************************************************
+        * If there is a problem getting the BODY nodes then return error 
+        ***************************************************************************************************************/
         try
         {
             oTextNodeList = oTextNode.getChildren();
@@ -179,45 +201,78 @@ public class Article
             return(null);
         }
         
+        /***************************************************************************************************************
+        * If there is only a single test node process it
+        ***************************************************************************************************************/
         if (oTextNodeList == null)
         {
             String strTemp = "";
 
+            /***********************************************************************************************************
+            * If the node can contain text then continue processing 
+            ***********************************************************************************************************/
             if (oTextNode instanceof TextNode)
             {
                 strTemp = oTextNode.getText();
                 
+                /*******************************************************************************************************
+                * If there are no periods then this is probably not an article, return error 
+                *******************************************************************************************************/
                 if (strTemp.indexOf(".") == -1)
                     return(null);
 
+                /*******************************************************************************************************
+                * If there is an ellipsis then return error (can't remember why I did this...)  
+                *******************************************************************************************************/
                 if (strTemp.indexOf("...") != -1)
                     return(null);
 
+                /*******************************************************************************************************
+                * If an HTML comment is found then return error  
+                *******************************************************************************************************/
                 if (strTemp.indexOf("<!--") != -1)
                     return(null);
                 
-                for (String strReplace : oReplace.getOrderedKeys())
-                    strTemp = strTemp.replaceAll(strReplace, oReplace.get(strReplace));
+                /*******************************************************************************************************
+                * Replace all strings defined in the rules   
+                *******************************************************************************************************/
+                for (String strReplace : oSource.getData().getArticleReplace().getOrderedKeys())
+                    strTemp = strTemp.replaceAll(strReplace, oSource.getData().getArticleReplace().get(strReplace));
 
                 strTemp = strTemp.trim();
                 
+                /*******************************************************************************************************
+                * Replace double (or greater) spaces with single spaces.   
+                *******************************************************************************************************/
                 while (strTemp.indexOf("  ") != -1)
                     strTemp = strTemp.replaceAll("  ", " ");
 
-                if (strTemp.length() < getArticleChunkSizeMin())
+                if (strTemp.length() < oSource.getData().getArticleChunkSizeMin())
                     return(null);
             }
 
+            /***********************************************************************************************************
+            * If nothing is left of the test return error 
+            ***********************************************************************************************************/
             if (strTemp.equals(""))
                 return(null);
+            /***********************************************************************************************************
+            * Else return the string 
+            ***********************************************************************************************************/
             else
                 return(strTemp);
         }
 
+        /***************************************************************************************************************
+        * Process the list of text nodes 
+        ***************************************************************************************************************/
         for (int iIndex = 0; iIndex < oTextNodeList.size(); iIndex++)
         {
             Node oChildNode = oTextNodeList.elementAt(iIndex);
 
+            /***********************************************************************************************************
+            * Process tags that might have text 
+            ***********************************************************************************************************/
             if ((oChildNode instanceof Div) || (oChildNode instanceof TableTag) ||
                 (oChildNode instanceof TableRow) || (oChildNode instanceof TableColumn) ||
                 (oChildNode instanceof TextNode) || (oChildNode instanceof Span)  || 
@@ -230,12 +285,25 @@ public class Article
             }
         }
 
+        /***********************************************************************************************************
+        * If the test length is zero then return error 
+        ***********************************************************************************************************/
         if (strText.length() == 0)
             return(null);
-        else
-            return(strText.trim());
+
+        /***********************************************************************************************************
+        * Return the article text 
+        ***********************************************************************************************************/
+        return(strText.trim());
     }
     
+    /*******************************************************************************************************************
+    * Retrieves the article image.
+    * 
+    * @param oParser A parsed representation of the HTML page
+    * 
+    * @return The article image if it is valid, null otherwise
+    *******************************************************************************************************************/
     private byte[] retrieveImage(org.htmlparser.Parser oParser) 
     {
         NodeList oImageNodeList = null;
@@ -246,6 +314,9 @@ public class Article
         
         oLogger.info("Retrieving article image");
 
+        /***************************************************************************************************************
+        * Try to find any nodes that have IMG tags 
+        ***************************************************************************************************************/
         try
         {
             oImageNodeList = oParser.extractAllNodesThatMatch (new TagNameFilter ("img"));
@@ -256,28 +327,49 @@ public class Article
             return(null);
         }
         
+        /***************************************************************************************************************
+        * Iterate through the image nodes 
+        ***************************************************************************************************************/
         for (int iIdx = 0; iIdx < oImageNodeList.size (); iIdx++)
         {
             ImageTag oImage = (ImageTag)oImageNodeList.elementAt (iIdx);
 
+            /***********************************************************************************************************
+            * Get the image height and width 
+            ***********************************************************************************************************/
             float iAspectRatio = 0;
             int iHeight = getAttributeInt(oImage, "height", 0);
             int iWidth = getAttributeInt(oImage, "width", 0);
 
+            /***********************************************************************************************************
+            * Skip this image if the height or the width are not specified 
+            ***********************************************************************************************************/
             if ((iWidth == 0) || (iHeight == 0))
                 continue;
 
-            if (iWidth < iImageWidthMin)
+            /***********************************************************************************************************
+            * Skip this image if the width does not meet the minumum 
+            ***********************************************************************************************************/
+            if (iWidth < oSource.getData().getImageWidthMin())
                 continue;
 
+            /***********************************************************************************************************
+            * Skip this image if it is not a JPEG 
+            ***********************************************************************************************************/
             if (!oImage.getImageURL().toLowerCase().endsWith(".jpg"))
                 continue;
 
+            /***********************************************************************************************************
+            * Skip this image if it is greater than the maximum aspect ratio 
+            ***********************************************************************************************************/
             iAspectRatio = (float)iWidth / (float)iHeight;
 
-            if ((iAspectRatio > iAspectRatioMax) || (iAspectRatio < 1))
+            if ((iAspectRatio > oSource.getData().getAspectRatioMax()) || (iAspectRatio < 1))
                 continue;
 
+            /***********************************************************************************************************
+            * Keep this image if it is bigger than the previous image 
+            ***********************************************************************************************************/
             if ((strImageURL == null) || ((iWidth * iHeight) > (iImageHeight * iImageWidth)))
             {
                 strImageURL = oImage.getImageURL();
@@ -286,6 +378,9 @@ public class Article
             }
         }
         
+        /***************************************************************************************************************
+        * If a suitable image was found, retrieve and process it 
+        ***************************************************************************************************************/
         if (strImageURL != null)
         {
             URL oURL = null;
@@ -294,31 +389,46 @@ public class Article
 
             try
             {
+                /*******************************************************************************************************
+                * Get the image 
+                *******************************************************************************************************/
                 oURL = new URL(strImageURL);
                 oHTTP = (HttpURLConnection) oURL.openConnection();
-                int iBorder = 1;
                 
                 oInput = oHTTP.getInputStream();
                 
+                /*******************************************************************************************************
+                * Strip the border 
+                *******************************************************************************************************/
                 BufferedImage oImage = ImageIO.read(oInput);
-                BufferedImage oNewImage = oImage.getSubimage(iBorder, iBorder, oImage.getWidth() - 
-                                                             (iBorder * 2), oImage.getHeight() - (iBorder * 2));
+                BufferedImage oNewImage = oImage.getSubimage(oSource.getData().getAspectRatioMax(), 
+                                                             oSource.getData().getAspectRatioMax(), 
+                                                             oImage.getWidth() - 
+                                                             (oSource.getData().getAspectRatioMax() * 2), 
+                                                             oImage.getHeight() - 
+                                                             (oSource.getData().getAspectRatioMax() * 2));
 
+                /*******************************************************************************************************
+                * Convert the image to JPEG 
+                *******************************************************************************************************/
                 ByteArrayOutputStream oOutput = new ByteArrayOutputStream();
                 MemoryCacheImageOutputStream oImageOutput = new MemoryCacheImageOutputStream(oOutput);
                 Iterator<ImageWriter> oImageIterator = ImageIO.getImageWritersByFormatName("jpeg");
                 ImageWriter oImageWriter = (ImageWriter)oImageIterator.next();
                 ImageWriteParam oImageWriterParam = oImageWriter.getDefaultWriteParam();
                 oImageWriterParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                oImageWriterParam.setCompressionQuality((float) .9);   // an integer between 0 and 1
+                oImageWriterParam.setCompressionQuality((float)0.9);
                 
                 oImageWriter.setOutput(oImageOutput);
                 IIOImage oImageTemp = new IIOImage(oNewImage, null, null);
                 oImageWriter.write(null, oImageTemp, oImageWriterParam);
                 oImageWriter.dispose();
                 
+                /*******************************************************************************************************
+                * Store the image in a byte array 
+                *******************************************************************************************************/
                 oBuffer = oOutput.toByteArray();
-                setImageURL(strImageURL);
+                this.strImageURL = strImageURL;
             }
             catch (Exception oException)
             {
@@ -327,14 +437,32 @@ public class Article
             }
         }
 
-    return(oBuffer);
+        /***************************************************************************************************************
+        * Return the image 
+        ***************************************************************************************************************/
+        return(oBuffer);
     }
 
+    /*******************************************************************************************************************
+    * Converts an HTML attribute to an integer.
+    * 
+    * @param oNode The node containing an integer attribute
+    * 
+    * @return The integer value of the attribute 
+    *******************************************************************************************************************/
     private static int getAttributeInt(TagNode oNode, String strAttribute)
     {
         return((new Integer(oNode.getAttribute(strAttribute))).intValue());
     }
 
+    /*******************************************************************************************************************
+    * Converts an HTML attribute to an integer.
+    * 
+    * @param oNode     The node containing an integer attribute
+    * @param iDefault  The default to use if the integer is invalid
+    * 
+    * @return The integer value of the attribute (or the default) 
+    *******************************************************************************************************************/
     private static int getAttributeInt(TagNode oNode, String strAttribute, int iDefault)
     {
         try
@@ -347,4 +475,51 @@ public class Article
         }
     }
     
+    /*******************************************************************************************************************
+    * @return Are the article image and text valid? 
+    *******************************************************************************************************************/
+    public boolean isGood()
+    {
+        return(bGood);
+    }
+
+    /*******************************************************************************************************************
+    * @return The article URL 
+    *******************************************************************************************************************/
+    public String getURL()
+    {
+        return(strURL);
+    }
+
+    /*******************************************************************************************************************
+    * @return The article image URL
+    *******************************************************************************************************************/
+    public String getImageURL()
+    {
+        return(strImageURL);
+    }
+
+    /*******************************************************************************************************************
+    * @return The article text
+    *******************************************************************************************************************/
+    public String getText()
+    {
+        return(strText);
+    }
+    
+    /*******************************************************************************************************************
+    * @return The raw article image
+    *******************************************************************************************************************/
+    public byte[] getImage()
+    {
+        return(oImageBuffer);
+    }
+    
+    /*******************************************************************************************************************
+    * @return The article tier (1 is top level, 2 or greater for all else) 
+    *******************************************************************************************************************/
+    public int getTier()
+    {
+        return(iTier);
+    }
 }
