@@ -65,9 +65,7 @@ public class Source extends Vector<Article>
                      /*******************************************************************
                      * Attempt to retrieve the article and store it if it looks good
                      *******************************************************************/
-                      Article oArticle = new Article(this, iDepth, oEntry.getUri(), oData.getImageWidthMin(), 
-                                                     oData.getAspectRatioMax(), oData.getArticleSizeMin(), 
-                                                     oData.getArticleChunkSizeMin(), oData.getArticleReplace());
+                      Article oArticle = new Article(this, iDepth, oEntry.getUri());
 
                       if (oArticle.retrieve())
                       {
