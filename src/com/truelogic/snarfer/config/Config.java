@@ -34,9 +34,9 @@ public class Config
     private Vector<ConfigSource> oConfigSources = new Vector<ConfigSource>(); // The list of news sources and RSS feeds
     
     /*******************************************************************************************************************
-    * Initalizes the snarfer config.
+    * Initializes the snarfer configuration.
     * 
-    * @param strIniFile  The full path and name of the ini file
+    * @param strIniFile  The full path and name of the INI file
     *******************************************************************************************************************/
     public Config(String strIniFile) throws IniException, IOException, SnarferException
     {
@@ -46,7 +46,7 @@ public class Config
     /*******************************************************************************************************************
     * Loads the snarfer parameters.
     * 
-    * @param strIniFile  The full path and name of the ini file
+    * @param strIniFile  The full path and name of the INI file
     *******************************************************************************************************************/
     private void loadParams(String strIniFile) throws IniException, IOException, SnarferException
     {

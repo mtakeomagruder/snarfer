@@ -22,7 +22,7 @@ public class ConfigReplace extends HashMap<String, String>
     Vector<String> oKeys;                               // Replacement keys in order;
 
     /*******************************************************************************************************************
-    * <p>Initalizes the replacement object.</p>
+    * <p>Initializes the replacement object.</p>
     * 
     * <p>The strRules parameter passed to the constructor should have the following format:</p>
     * 

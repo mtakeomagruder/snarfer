@@ -11,17 +11,17 @@ import com.truelogic.snarfer.config.*;
 * 
 * <p>A snarfer is a program that pulls data from some other source, generally not in the way that it was intended to be
 * accessed.  In this case, the snarfer pulls articles and images from news sites such as CNN and BBC.  News sources
-* generally do not provide any programmatic way to get this data, so we parse the html to get the correct image and
+* generally do not provide any programmatic way to get this data, so we parse the HTML to get the correct image and
 * the associated text for any given article.</p>
 * 
 * <p>The first revision of the program (2005) followed the link tree to find articles.  This was error prone and 
 * eventually produced fewer articles as sites started to incorporate Javascript links.  In 2010 the indexing code was 
 * changed to use RSS feeds.  In 2005 these had not produced sufficient data, but by 2010 they listed more articles than 
-* we were getting from walking the html pages.</p>
+* we were getting from walking the HTML pages.</p>
 * 
 * <p>The current version is consists of these steps:</p>
 * <p>1. A list of articles is created from the provided RSS feeds for each site.</p>
-* <p>2. Each html page is loaded and the article text is scraped off.  The article image is identified by its 
+* <p>2. Each HTML page is loaded and the article text is scraped off.  The article image is identified by its 
 * proportions and size.<p>
 * <p>3. The data is saved into the DB from the internal structures in a single transaction.</p>
 * <p>4. The data is then exported from the DB to disk files as needed.</p>
@@ -86,7 +86,7 @@ public class Main
         /***************************************************************************************************************
         * Save data from the DB into files on disk
         ***************************************************************************************************************/
-        oLogger.info("Saving snarfer data to files");
+        oLogger.info("Saving snarfer data to files (flash)");
         DbToFileFlash oDbToFile = new DbToFileFlash(oDate, oConfig.getDb(), oConfig.getOutputDir(), 
                                                     oConfig.getArticleCount(), oConfig.getImageWidth(), 
                                                     oConfig.getImageHeight(), oConfig.getImageQuality());
