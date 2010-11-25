@@ -28,9 +28,10 @@ public class Article
     private byte[] oImageBuffer = null;
     private String strText = null;
     private String strImageURL = null;
+    private ArticleReplace oReplace;
     
     public Article(Source oSource, int iTier, String strURL, int iImageWidthMin, int iAspectRatioMax, 
-                   int iArticleSizeMin, int iArticleChunkSizeMin)
+                   int iArticleSizeMin, int iArticleChunkSizeMin, ArticleReplace oReplace)
     {
         oLogger.info("Loading article: " + strURL + " (" + iTier + ")");
         
@@ -41,6 +42,8 @@ public class Article
         this.iAspectRatioMax = iAspectRatioMax;
         this.iArticleSizeMin = iArticleSizeMin;
         this.iArticleChunkSizeMin = iArticleChunkSizeMin;
+        
+        this.oReplace = oReplace;
     }
     
     public boolean isGood()
@@ -190,15 +193,10 @@ public class Article
 
                 if (strTemp.indexOf("<!--") != -1)
                     return(null);
+                
+                for (String strReplace : oReplace.getOrderedKeys())
+                    strTemp = strTemp.replaceAll(strReplace, oReplace.get(strReplace));
 
-                strTemp = strTemp.replaceAll("&nbsp;", " ");
-                strTemp = strTemp.replaceAll("&quot;", "\"");
-                strTemp = strTemp.replaceAll("&#151;", "[");
-                strTemp = strTemp.replaceAll("&#93;", "]");
-                strTemp = strTemp.replaceAll("\n\r", " ");
-                strTemp = strTemp.replaceAll("\r\n", " ");
-                strTemp = strTemp.replaceAll("\r", " ");
-                strTemp = strTemp.replaceAll("\n", " ");
                 strTemp = strTemp.trim();
                 
                 while (strTemp.indexOf("  ") != -1)

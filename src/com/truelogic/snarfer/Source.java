@@ -66,7 +66,7 @@ public class Source extends Vector<Article>
                      *******************************************************************/
                       Article oArticle = new Article(this, iDepth, oEntry.getUri(), oData.getImageWidthMin(), 
                                                      oData.getAspectRatioMax(), oData.getArticleSizeMin(), 
-                                                     oData.getArticleChunkSizeMin());
+                                                     oData.getArticleChunkSizeMin(), oData.getArticleReplace());
 
                       if (oArticle.retrieve())
                       {

@@ -16,6 +16,7 @@ public class SourceData
     private int iAspectRatioMax;                            // Max image aspect ratio
     private int iArticleSizeMin;                            // Minimum size for the article text
     private int iArticleChunkSizeMin;                       // Minimum chunk size for each section of the article
+    private ArticleReplace oArticleReplace;                 // Replacement rules
     
     /*******************************************************************************************************************
     * Initializes the SourceData object.
@@ -29,7 +30,7 @@ public class SourceData
     * @param iArticleChunkSizeMin  Minimum chunk size for each section of the article
     *******************************************************************************************************************/
     public SourceData(String strID, Vector<String> strURLs, String strName, int iImageWidthMin, int iAspectRatioMax,
-                      int iArticleSizeMin, int iArticleChunkSizeMin)
+                      int iArticleSizeMin, int iArticleChunkSizeMin, ArticleReplace oArticleReplace)
     {
         this.strID = strID;
         this.strURLs = strURLs;
@@ -38,6 +39,7 @@ public class SourceData
         this.iAspectRatioMax = iAspectRatioMax;
         this.iArticleSizeMin = iArticleSizeMin;
         this.iArticleChunkSizeMin = iArticleChunkSizeMin;
+        this.oArticleReplace = oArticleReplace;
     }
 
     /*******************************************************************************************************************
@@ -89,10 +91,18 @@ public class SourceData
     }
 
     /*******************************************************************************************************************
-     * @return The minimum size for an article chunk 
-     *******************************************************************************************************************/
+    * @return The minimum size for an article chunk 
+    *******************************************************************************************************************/
     public int getArticleChunkSizeMin() 
     {
         return(iArticleChunkSizeMin);
+    }
+    
+    /*******************************************************************************************************************
+    * @return The article replacement rules 
+    *******************************************************************************************************************/
+    public ArticleReplace getArticleReplace() 
+    {
+        return(oArticleReplace);
     }
 }
