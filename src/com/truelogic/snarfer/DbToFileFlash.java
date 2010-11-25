@@ -14,34 +14,6 @@ import com.truelogic.common.*;
 
 public class DbToFileFlash 
 {
-    private class Article
-    {
-        int iID;
-        int iSourceURLID;
-        String strRandomID;
-        int iTier;
-        int iSize;
-        String strTextHash;
-        String strTextURL;
-        String strText;
-        int iImageID;
-        int iImageSize;
-        String strImageHash;
-        String strImageURL;
-        byte[] tyImage;
-        int iBatchID;
-    }
-    
-    private class Source
-    {
-        int iID;
-        String strTextID;
-        String strName;
-        int iURLID;
-        String strURL;
-        Vector<Article> oArticleList;
-    }
-    
     private Connection oDB = null;
     private java.sql.Date oDate;
     private String strOutputDir;
@@ -81,7 +53,7 @@ public class DbToFileFlash
     public void run() throws SQLException, Exception
     {
         int iBatchID = getBatch(oDate);
-        Vector<Source> oSourceList = getSourceList(iBatchID);
+        Vector<DbSource> oSources = getSourceList(iBatchID);
         FileWriter oTextWriter;
 
         String strSourceOutputDir = strOutputDir + "00.tmp";
@@ -90,31 +62,30 @@ public class DbToFileFlash
         strSourceOutputDir += "/flash/";
         (new File(strSourceOutputDir)).mkdir();
 
-        for (int iSourceIdx = 0; iSourceIdx < oSourceList.size(); iSourceIdx++)
+        for (int iSourceIdx = 0; iSourceIdx < oSources.size(); iSourceIdx++)
         {
-            Source oSource = oSourceList.get(iSourceIdx);
+            int iArticleIdx = 0;
+            DbSource oSource = oSources.get(iSourceIdx);
 
             String strSource = 
                 "content=\r\n" +
-                "id=" + oSource.iID + "\r\n" +
-                "text_id=" + oSource.strTextID + "\r\n" +
-                "name=" + oSource.strName + "\r\n" +
-                "url_id=" + oSource.iURLID + "\r\n" +
-                "url=" + oSource.strURL;
+                "id=" + oSource.getID() + "\r\n" +
+                "text_id=" + oSource.getTextID() + "\r\n" +
+                "name=" + oSource.getName() + "\r\n" +
+                "url_id=" + oSource.getUrlID() + "\r\n" +
+                "url=" + oSource.getUrl();
                     
-            oTextWriter = new FileWriter(strSourceOutputDir + oSource.strTextID + ".cnt");            
+            oTextWriter = new FileWriter(strSourceOutputDir + oSource.getTextID() + ".cnt");            
             oTextWriter.write(strSource);
             oTextWriter.close();
             
-            for (int iArticleIdx = 0; iArticleIdx < oSource.oArticleList.size(); iArticleIdx++)
+            for (DbArticle oArticle : oSource.getArticles())
             {
-                Article oArticle = oSource.oArticleList.get(iArticleIdx);
-                
-                String strFileName = oSource.strTextID + "-" + padInt(iArticleIdx, 3);
+                String strFileName = oSource.getTextID() + "-" + padInt(iArticleIdx, 3);
             
                 oTextWriter = new FileWriter(strSourceOutputDir + strFileName + ".txt");
                 
-                String strText = oArticle.strText.replaceAll("\\&\\#039\\;", "'");
+                String strText = oArticle.getText().replaceAll("\\&\\#039\\;", "'");
                 strText = strText.replaceAll("\\&\\#[0-9]+\\;", "");
                 strText = strText.replaceAll("\\&[a-z]+\\;", "");
 
@@ -123,20 +94,20 @@ public class DbToFileFlash
                 
                 FileOutputStream oImageWriter = new FileOutputStream(strSourceOutputDir + strFileName + ".jpg");
 
-                oImageWriter.write(resizeImage(oArticle.tyImage, iImageWidth, iImageHeight, iImageQuality));
+                oImageWriter.write(resizeImage(oArticle.getImage(), iImageWidth, iImageHeight, iImageQuality));
                 oImageWriter.close();
 
                 String strContent = 
                     "content=\r\n" +
                     "sequence=" + iArticleIdx + "\r\n" +
-                    "id=" + oArticle.iID + "\r\n" +
-                    "source_url_id=" + oArticle.iSourceURLID + "\r\n" +
-                    "random_id=" + oArticle.strRandomID + "\r\n" +
-                    "tier=" + oArticle.iTier + "\r\n" +
-                    "size=" + oArticle.iSize + "\r\n" +
-                    "hash=" + oArticle.strTextHash + "\r\n" +
-                    "url=" + oArticle.strTextURL + "\r\n" +
-                    "batch_id=" + oArticle.iBatchID;
+                    "id=" + oArticle.getID() + "\r\n" +
+                    "source_url_id=" + oArticle.getSourceUrlID() + "\r\n" +
+                    "random_id=" + oArticle.getRandomID() + "\r\n" +
+                    "tier=" + oArticle.getTier() + "\r\n" +
+                    "size=" + oArticle.getTextSize() + "\r\n" +
+                    "hash=" + oArticle.getTextHash() + "\r\n" +
+                    "url=" + oArticle.getTextUrl() + "\r\n" +
+                    "batch_id=" + oArticle.getBatchID();
 
                 oTextWriter = new FileWriter(strSourceOutputDir + strFileName + ".txt.cnt");
 
@@ -146,16 +117,18 @@ public class DbToFileFlash
                 strContent = 
                     "content=\r\n" +
                     "sequence=" + iArticleIdx + "\r\n" +
-                    "id=" + oArticle.iImageID + "\r\n" +
-                    "size=" + oArticle.iImageSize + "\r\n" +
-                    "hash=" + oArticle.strImageHash + "\r\n" +
-                    "url=" + oArticle.strImageURL + "\r\n" +
-                    "batch_id=" + oArticle.iBatchID;
+                    "id=" + oArticle.getImageID() + "\r\n" +
+                    "size=" + oArticle.getImageSize() + "\r\n" +
+                    "hash=" + oArticle.getImageHash() + "\r\n" +
+                    "url=" + oArticle.getImageUrl() + "\r\n" +
+                    "batch_id=" + oArticle.getBatchID();
 
                 oTextWriter = new FileWriter(strSourceOutputDir + strFileName + ".jpg.cnt");
 
                 oTextWriter.write(strContent);
                 oTextWriter.close();
+                
+                iArticleIdx++;
             }
         }
         
@@ -225,11 +198,11 @@ public class DbToFileFlash
     return(iBatchID);
     }
     
-    private Vector<Source> getSourceList(int iBatchID) throws SQLException, Exception
+    private Vector<DbSource> getSourceList(int iBatchID) throws SQLException, Exception
     {
         
         PreparedStatement oStatement = null;
-        Vector<Source> oSourceList = new Vector<Source>();
+        Vector<DbSource> oSources = new Vector<DbSource>();
         
         try
         {
@@ -251,15 +224,14 @@ public class DbToFileFlash
            
            while (oResult.next())
            {
-               Source oSource = new Source();
-               oSource.iID = oResult.getInt("id");
-               oSource.strTextID = oResult.getString("text_id");
-               oSource.strName = oResult.getString("name");
-               oSource.iURLID = oResult.getInt("url_id");
-               oSource.strURL = oResult.getString("url");
-               oSource.oArticleList = getArticleList(oSource.iID, iBatchID, iLimit);
+               DbSource oSource = new DbSource(oResult.getInt("id"),
+                                               oResult.getString("text_id"),
+                                               oResult.getString("name"),
+                                               oResult.getInt("url_id"),
+                                               oResult.getString("url"),
+                                               getArticleList(oResult.getInt("id"), iBatchID, iLimit));
                
-               oSourceList.add(oSource);
+               oSources.add(oSource);
            }
         }
         finally
@@ -267,13 +239,13 @@ public class DbToFileFlash
             if (oStatement != null) oStatement.close();
         }
         
-    return(oSourceList);
+        return(oSources);
     }
     
-   private Vector<Article> getArticleList(int iSourceID, int iBatchID, int iLimit) throws SQLException, Exception
+   private Vector<DbArticle> getArticleList(int iSourceID, int iBatchID, int iLimit) throws SQLException, Exception
     {
         PreparedStatement oStatement = null;
-        Vector<Article> oArticleList = new Vector<Article>();
+        Vector<DbArticle> oArticleList = new Vector<DbArticle>();
 
         try
         {
@@ -289,22 +261,6 @@ public class DbToFileFlash
            
            while(oResult.next())
            {
-               Article oArticle = new Article();
-               
-               oArticle.iID = oResult.getInt("id");
-               oArticle.strRandomID = oResult.getString("random_id");
-               oArticle.iSourceURLID = oResult.getInt("source_url_id");
-               oArticle.iTier = oResult.getInt("tier");
-               oArticle.iSize = oResult.getInt("size");
-               oArticle.strTextHash = oResult.getString("hash");
-               oArticle.strTextURL = oResult.getString("url");
-               oArticle.strText = oResult.getString("data");
-
-               oArticle.iImageID = oResult.getInt("image_id");
-               oArticle.iImageSize = oResult.getInt("image_size");
-               oArticle.strImageHash = oResult.getString("image_hash");
-               oArticle.strImageURL = oResult.getString("image_url");
-               
                ByteArrayOutputStream oImage = new ByteArrayOutputStream();
                byte[] tyByte = new byte[1];
                
@@ -313,9 +269,20 @@ public class DbToFileFlash
                while(oInput.read(tyByte, 0, 1) != -1)
                    oImage.write(tyByte, 0, 1);
                
-               oArticle.tyImage = oImage.toByteArray();
-
-               oArticle.iBatchID = oResult.getInt("batch_id");
+               DbArticle oArticle = new DbArticle(oResult.getInt("id"),
+                                                  oResult.getInt("source_url_id"),
+                                                  oResult.getString("random_id"),
+                                                  oResult.getInt("tier"),
+                                                  oResult.getInt("size"),
+                                                  oResult.getString("hash"),
+                                                  oResult.getString("url"),
+                                                  oResult.getString("data"),
+                                                  oResult.getInt("image_id"),
+                                                  oResult.getInt("image_size"),
+                                                  oResult.getString("image_hash"),
+                                                  oResult.getString("image_url"),
+                                                  oImage.toByteArray(),
+                                                  oResult.getInt("batch_id"));
                               
                oArticleList.add(oArticle);
            }
