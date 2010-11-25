@@ -1,9 +1,20 @@
 package com.truelogic.common;
 
-import java.io.File;
+// Java imports
+import java.io.*;
 
+/***********************************************************************************************************************
+* <p>This class contains various file utility functions.</p>
+* 
+* @author David Steele
+***********************************************************************************************************************/
 public class FileUtil 
 {
+    /*******************************************************************************************************************
+    * Removes a file or directory all sub files and directories. 
+    * 
+    * @param oDirectory  The file or directory to remove
+    *******************************************************************************************************************/
     public static void removeDir(File oDirectory)
     {
         if (oDirectory.isDirectory())      
@@ -18,6 +29,5 @@ public class FileUtil
         }
 
         oDirectory.delete();                           
-        return;
     }    
 }
