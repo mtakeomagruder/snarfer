@@ -22,9 +22,9 @@ public class Config
     
     private ConfigDb oDb;                   // Database configuration
     private ConfigOutput oOutput;           // Output directory and files parameters
-    private ConfigReplace oConfigReplace;   // The replacement rules for an article
+    private ConfigReplace oReplace;         // Replacement rules for an article
     
-    private Vector<ConfigSource> oConfigSources = new Vector<ConfigSource>(); // The list of news sources and RSS feeds
+    private Vector<ConfigSource> oSources;  // List of news sources and RSS feeds
     
     /*******************************************************************************************************************
     * Initializes the snarfer configuration.
@@ -33,6 +33,8 @@ public class Config
     *******************************************************************************************************************/
     public Config(String strIniFile) throws IniException, IOException, SnarferException
     {
+        oSources = new Vector<ConfigSource>();
+        
         loadParams(strIniFile);
     }
 
@@ -144,14 +146,14 @@ public class Config
                 iIndex += 1;
             }
             
-            oConfigReplace = new ConfigReplace(strRules);
+            oReplace = new ConfigReplace(strRules);
             
             /***********************************************************************************************************
             * Save the source if not null  
             ***********************************************************************************************************/
             if (strID != null)
-                oConfigSources.add(new ConfigSource(strID, strURLs, strName, iImageWidthMin, iAspectRatioMax,
-                                   iArticleSizeMin, iArticleChunkSizeMin, iBorderWidth, oConfigReplace));
+                oSources.add(new ConfigSource(strID, strURLs, strName, iImageWidthMin, iAspectRatioMax,
+                                              iArticleSizeMin, iArticleChunkSizeMin, iBorderWidth, oReplace));
         }
     }
      
@@ -173,9 +175,9 @@ public class Config
      /******************************************************************************************************************
      * @return Default list of replacement rules for articles
      ******************************************************************************************************************/
-      public ConfigReplace getArticleReplace() 
+      public ConfigReplace getReplace() 
       {
-          return(oConfigReplace);
+          return(oReplace);
       }
 
      /******************************************************************************************************************
@@ -183,6 +185,6 @@ public class Config
      ******************************************************************************************************************/
      public Vector<ConfigSource> getSources() 
      {
-         return(oConfigSources);
+         return(oSources);
      }
 }
