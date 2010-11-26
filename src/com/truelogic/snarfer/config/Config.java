@@ -20,15 +20,8 @@ public class Config
 {
     static Logger oLogger = Logger.getLogger(Config.class);
     
-    private String strOutputDir;            // The output directory for the flash images and text
-    
     private ConfigDb oDb;                   // Database configuration
-
-    private int iArticleCount;              // The number of articles to output in the flash directory
-    private int iImageWidth;                // The width of the output flash images
-    private int iImageHeight;               // The height of the output flash images
-    private int iImageQuality;              // The JPEG quality of the output flash images
-    
+    private ConfigOutput oOutput;           // Output directory and files parameters
     private ConfigReplace oConfigReplace;   // The replacement rules for an article
     
     private Vector<ConfigSource> oConfigSources = new Vector<ConfigSource>(); // The list of news sources and RSS feeds
@@ -60,11 +53,12 @@ public class Config
         * Load the flash output parameters 
         ***************************************************************************************************************/
         oLogger.info("Loading general properties");
-        strOutputDir = oIni.StringGet("output", "dir");
-        iArticleCount = oIni.IntGet("output", "article_count", 100);
-        iImageWidth = oIni.IntGet("output", "image_width", 320);
-        iImageHeight = oIni.IntGet("output", "image_height", 240);
-        iImageQuality = oIni.IntGet("output", "image_quality", 80);
+        
+        oOutput = new ConfigOutput(oIni.StringGet("output", "dir"), 
+                                   oIni.IntGet("output", "article_count", 100),
+                                   oIni.IntGet("output", "image_width", 320),
+                                   oIni.IntGet("output", "image_height", 240),
+                                   oIni.IntGet("output", "image_quality", 80));
 
         /***************************************************************************************************************
         * Load the DB parameters 
@@ -170,45 +164,12 @@ public class Config
      }
     
      /******************************************************************************************************************
-     * @return Directory where the flash output files are written
+     * @return Output directory and files parameters
      ******************************************************************************************************************/
-     public String getOutputDir() 
+     public ConfigOutput getOutput() 
      {
-         return(strOutputDir);
+         return(oOutput);
      }
-
-     /******************************************************************************************************************
-     * @return Maximum number of articles that will be written to the flash directory
-     ******************************************************************************************************************/
-     public int getArticleCount() 
-     {
-         return(iArticleCount);
-     }
-
-     /******************************************************************************************************************
-     * @return Width of the images that will be written to the flash directory
-     ******************************************************************************************************************/
-     public int getImageWidth() 
-     {
-         return(iImageWidth);
-     }
-
-     /******************************************************************************************************************
-     * @return Height of the images that will be written to the flash directory
-     ******************************************************************************************************************/
-     public int getImageHeight() 
-     {
-         return(iImageHeight);
-     }
-
-     /******************************************************************************************************************
-     * @return JPEG quality (0-100) of the images that will be written to the flash directory
-     ******************************************************************************************************************/
-     public int getImageQuality() 
-     {
-         return(iImageQuality);
-     }
-
      /******************************************************************************************************************
      * @return Default list of replacement rules for articles
      ******************************************************************************************************************/
