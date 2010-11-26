@@ -6,18 +6,15 @@ import java.sql.*;
 
 // Project imports
 import com.truelogic.snarfer.config.*;
+import com.truelogic.snarfer.db.*;
 
-public class SnarferToDb 
+public class SnarferToDb extends Db 
 {
-    private Connection oDB = null;
     private Snarfer oSnarfer = null;
     
     public SnarferToDb(Snarfer oSnarfer, ConfigDb oConfigDb) throws ClassNotFoundException, SQLException
     {
-        Class.forName(oConfigDb.getDriver());
-
-        oDB = DriverManager.getConnection(oConfigDb.getConnect(), oConfigDb.getUser(), oConfigDb.getPassword());
-        oDB.setAutoCommit(false);
+        super(oConfigDb);
         
         this.oSnarfer = oSnarfer;
     }
@@ -50,11 +47,12 @@ public class SnarferToDb
                                  oArticle.getImage(), oArticle.getImageURL());
                 }
             }
-            oDB.commit();
+            
+            getDb().commit();
         }
         finally
         {
-            oDB.rollback();
+            getDb().rollback();
         }
      
         return(oDate);
@@ -70,7 +68,7 @@ public class SnarferToDb
             String strSQL = 
                 "select date(now()) as date";
             
-           oStatement = oDB.prepareStatement(strSQL);
+           oStatement = getDb().prepareStatement(strSQL);
            
            ResultSet oResult = oStatement.executeQuery();
            
@@ -97,7 +95,7 @@ public class SnarferToDb
             String strSQL = 
                 "select source_insert(?, ?, ?) as source_id";
             
-           oStatement = oDB.prepareStatement(strSQL);
+           oStatement = getDb().prepareStatement(strSQL);
            
            oStatement.setString(1, strTextID);
            oStatement.setString(2, strName);
@@ -128,7 +126,7 @@ public class SnarferToDb
             String strSQL = 
                 "select batch_insert(?) as batch_id";
             
-           oStatement = oDB.prepareStatement(strSQL);
+           oStatement = getDb().prepareStatement(strSQL);
            oStatement.setDate(1, oDate);
            ResultSet oResult = oStatement.executeQuery();
            
@@ -157,7 +155,7 @@ public class SnarferToDb
             String strSQL = 
                 "select article_insert(?, ?, ?, ?, ?, ?, ?) as article_id";
             
-           oStatement = oDB.prepareStatement(strSQL);
+           oStatement = getDb().prepareStatement(strSQL);
            
            oStatement.setInt(1, iBatchID);
            oStatement.setInt(2, iSourceID);

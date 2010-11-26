@@ -14,9 +14,13 @@ import com.truelogic.common.*;
 import com.truelogic.snarfer.config.*;
 import com.truelogic.snarfer.db.*;
 
-public class DbToFileFlash 
+/***********************************************************************************************************************
+* Represents a news source loaded from the database (denormalized).
+* 
+* @author David Steele
+***********************************************************************************************************************/
+public class DbToFileFlash extends Db
 {
-    private Connection oDB = null;
     private java.sql.Date oDate;
     private String strOutputDir;
     private int iLimit;
@@ -28,27 +32,14 @@ public class DbToFileFlash
                          int iImageWidth, int iImageHeight, int iImageQuality) 
                          throws ClassNotFoundException, SQLException
     {
-        Class.forName(oConfigDb.getDriver());
-
-        oDB = DriverManager.getConnection(oConfigDb.getConnect(), oConfigDb.getUser(), oConfigDb.getPassword());
-        oDB.setAutoCommit(false);
-
+        super(oConfigDb);
+        
         this.oDate = oDate;
         this.strOutputDir = strOutputDir;
         this.iLimit = iLimit;
         this.iImageWidth = iImageWidth;
         this.iImageHeight = iImageHeight;
         this.iImageQuality = iImageQuality;
-    }
-    
-    private String padInt(int iInt, int iPad)
-    {
-        String strInt = "" + iInt;
-
-        while (strInt.length() < iPad)
-            strInt = "0" + strInt;
-
-        return(strInt);
     }
     
     public void run() throws SQLException, Exception
@@ -82,7 +73,7 @@ public class DbToFileFlash
             
             for (DbArticle oArticle : oSource.getArticles())
             {
-                String strFileName = oSource.getTextID() + "-" + padInt(iArticleIdx, 3);
+                String strFileName = oSource.getTextID() + "-" + StringUtil.leftPad(iArticleIdx, 3, '0');
             
                 oTextWriter = new FileWriter(strSourceOutputDir + strFileName + ".txt");
                 
@@ -181,7 +172,7 @@ public class DbToFileFlash
                 strSQL = 
                     "select id from batch where day = ?";
             
-           oStatement = oDB.prepareStatement(strSQL);
+           oStatement = getDb().prepareStatement(strSQL);
            if (oDate != null)
                oStatement.setDate(1, oDate);
            ResultSet oResult = oStatement.executeQuery();
@@ -219,7 +210,7 @@ public class DbToFileFlash
                 "            and batch_article.article_id = article.id\n" +
                 "          )";
             
-           oStatement = oDB.prepareStatement(strSQL);
+           oStatement = getDb().prepareStatement(strSQL);
            oStatement.setInt(1, iBatchID);
            ResultSet oResult = oStatement.executeQuery();
            
@@ -253,7 +244,7 @@ public class DbToFileFlash
             String strSQL = 
                 "select * from article_list_get(?, ?, ?)";
             
-           oStatement = oDB.prepareStatement(strSQL);
+           oStatement = getDb().prepareStatement(strSQL);
            
            oStatement.setInt(1, iBatchID);
            oStatement.setInt(2, iSourceID);
@@ -274,12 +265,10 @@ public class DbToFileFlash
                                                   oResult.getInt("source_url_id"),
                                                   oResult.getString("random_id"),
                                                   oResult.getInt("tier"),
-                                                  oResult.getInt("size"),
                                                   oResult.getString("hash"),
                                                   oResult.getString("url"),
                                                   oResult.getString("data"),
                                                   oResult.getInt("image_id"),
-                                                  oResult.getInt("image_size"),
                                                   oResult.getString("image_hash"),
                                                   oResult.getString("image_url"),
                                                   oImage.toByteArray(),
