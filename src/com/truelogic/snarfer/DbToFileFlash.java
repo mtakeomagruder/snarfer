@@ -23,24 +23,15 @@ import com.truelogic.snarfer.exception.*;
 public class DbToFileFlash extends Db
 {
     private java.sql.Date oDate;
-    private String strOutputDir;
-    private int iLimit;
-    private int iImageWidth;
-    private int iImageHeight;
-    private int iImageQuality;
+    private ConfigOutput oConfigOutput;
     
-    public DbToFileFlash(java.sql.Date oDate, ConfigDb oConfigDb, String strOutputDir, int iLimit, 
-                         int iImageWidth, int iImageHeight, int iImageQuality) 
+    public DbToFileFlash(java.sql.Date oDate, ConfigDb oConfigDb, ConfigOutput oConfigOutput) 
                          throws ClassNotFoundException, SQLException
     {
         super(oConfigDb);
         
         this.oDate = oDate;
-        this.strOutputDir = strOutputDir;
-        this.iLimit = iLimit;
-        this.iImageWidth = iImageWidth;
-        this.iImageHeight = iImageHeight;
-        this.iImageQuality = iImageQuality;
+        this.oConfigOutput = oConfigOutput;
     }
     
     public void run() throws SQLException, SnarferException, IOException
@@ -49,7 +40,7 @@ public class DbToFileFlash extends Db
         Vector<DbSource> oSources = getSourceList(iBatchID);
         FileWriter oTextWriter;
 
-        String strSourceOutputDir = strOutputDir + "00.tmp";
+        String strSourceOutputDir = oConfigOutput.getOutputDir() + "00.tmp";
         FileUtil.removeDir(new File(strSourceOutputDir));
         (new File(strSourceOutputDir)).mkdir();
         strSourceOutputDir += "/flash/";
@@ -87,7 +78,8 @@ public class DbToFileFlash extends Db
                 
                 FileOutputStream oImageWriter = new FileOutputStream(strSourceOutputDir + strFileName + ".jpg");
 
-                oImageWriter.write(resizeImage(oArticle.getImage(), iImageWidth, iImageHeight, iImageQuality));
+                oImageWriter.write(resizeImage(oArticle.getImage(), oConfigOutput.getImageWidth(), 
+                                               oConfigOutput.getImageHeight(), oConfigOutput.getImageQuality()));
                 oImageWriter.close();
 
                 String strContent = 
@@ -125,9 +117,9 @@ public class DbToFileFlash extends Db
             }
         }
         
-        FileUtil.removeDir(new File(strOutputDir + "00.old"));
-        (new File(strOutputDir + "00")).renameTo(new File(strOutputDir + "00.old"));
-        (new File(strOutputDir + "00.tmp")).renameTo(new File(strOutputDir + "00"));
+        FileUtil.removeDir(new File(oConfigOutput.getOutputDir() + "00.old"));
+        (new File(oConfigOutput.getOutputDir() + "00")).renameTo(new File(oConfigOutput.getOutputDir() + "00.old"));
+        (new File(oConfigOutput.getOutputDir() + "00.tmp")).renameTo(new File(oConfigOutput.getOutputDir() + "00"));
     }
     
     private byte[] resizeImage(byte[] tyImage, int iWidth, int iHeight, int iQuality) throws IOException
@@ -220,7 +212,8 @@ public class DbToFileFlash extends Db
                                                 oResult.getString("name"),
                                                 oResult.getInt("url_id"),
                                                 oResult.getString("url"),
-                                                getArticleList(oResult.getInt("id"), iBatchID, iLimit));
+                                                getArticleList(oResult.getInt("id"), iBatchID, 
+                                                               oConfigOutput.getLimit()));
                
                 oSources.add(oSource);
             }
