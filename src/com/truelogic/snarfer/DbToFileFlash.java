@@ -13,6 +13,7 @@ import javax.imageio.stream.*;
 import com.truelogic.common.*;
 import com.truelogic.snarfer.config.*;
 import com.truelogic.snarfer.db.*;
+import com.truelogic.snarfer.exception.*;
 
 /***********************************************************************************************************************
 * Represents a news source loaded from the database (denormalized).
@@ -42,7 +43,7 @@ public class DbToFileFlash extends Db
         this.iImageQuality = iImageQuality;
     }
     
-    public void run() throws SQLException, Exception
+    public void run() throws SQLException, SnarferException, IOException
     {
         int iBatchID = getBatch(oDate);
         Vector<DbSource> oSources = getSourceList(iBatchID);
@@ -156,95 +157,92 @@ public class DbToFileFlash extends Db
         return(oOutput.toByteArray());
     }
     
-    private int getBatch(java.sql.Date oDate) throws SQLException, Exception
+    private int getBatch(java.sql.Date oDate) throws SQLException, SnarferException
     {
-        PreparedStatement oStatement = null;
+        String strSQL = "";
+        
+        if (oDate == null)
+            strSQL = 
+                "select id from batch where day in (select max(day) from batch)";
+        else
+            strSQL = 
+                "select id from batch where day = ?";
+        
+        PreparedStatement oStatement = getDb().prepareStatement(strSQL);
         int iBatchID = 0;
         
         try
         {
-            String strSQL = "";
+            if (oDate != null)
+                oStatement.setDate(1, oDate);
             
-            if (oDate == null)
-                strSQL = 
-                    "select id from batch where day in (select max(day) from batch)";
-            else
-                strSQL = 
-                    "select id from batch where day = ?";
-            
-           oStatement = getDb().prepareStatement(strSQL);
-           if (oDate != null)
-               oStatement.setDate(1, oDate);
-           ResultSet oResult = oStatement.executeQuery();
+            ResultSet oResult = oStatement.executeQuery();
            
-           if (oResult.next())
-               iBatchID = oResult.getInt("id");
-           else
-               throw new Exception("Unable to find the batch");
+            if (oResult.next())
+                iBatchID = oResult.getInt("id");
+            else
+                throw new SnarferException("Unable to find the batch");
         }
         finally
         {
-            if (oStatement != null) oStatement.close();
+            oStatement.close();
         }
         
     return(iBatchID);
     }
     
-    private Vector<DbSource> getSourceList(int iBatchID) throws SQLException, Exception
+    private Vector<DbSource> getSourceList(int iBatchID) throws SQLException, IOException
     {
+        String strSQL = 
+            "select source.id, source.text_id, source.name, source_url.id as url_id, source_url.url\n" +
+            " from source, source_url\n" +
+            "where source.id = source_url.source_id\n" +
+            "  and source_url.id in\n" +
+            "          (\n" +
+            "          select distinct(article.source_url_id)\n" +
+            "          from article, batch_article\n" +
+            "          where batch_article.batch_id = ?\n" +
+            "            and batch_article.article_id = article.id\n" +
+            "          )";
         
-        PreparedStatement oStatement = null;
+        PreparedStatement oStatement = getDb().prepareStatement(strSQL);
         Vector<DbSource> oSources = new Vector<DbSource>();
         
         try
         {
-            String strSQL = 
-                "select source.id, source.text_id, source.name, source_url.id as url_id, source_url.url\n" +
-                " from source, source_url\n" +
-                "where source.id = source_url.source_id\n" +
-                "  and source_url.id in\n" +
-                "          (\n" +
-                "          select distinct(article.source_url_id)\n" +
-                "          from article, batch_article\n" +
-                "          where batch_article.batch_id = ?\n" +
-                "            and batch_article.article_id = article.id\n" +
-                "          )";
-            
-           oStatement = getDb().prepareStatement(strSQL);
-           oStatement.setInt(1, iBatchID);
-           ResultSet oResult = oStatement.executeQuery();
+            oStatement.setInt(1, iBatchID);
+            ResultSet oResult = oStatement.executeQuery();
            
-           while (oResult.next())
-           {
-               DbSource oSource = new DbSource(oResult.getInt("id"),
-                                               oResult.getString("text_id"),
-                                               oResult.getString("name"),
-                                               oResult.getInt("url_id"),
-                                               oResult.getString("url"),
-                                               getArticleList(oResult.getInt("id"), iBatchID, iLimit));
+            while (oResult.next())
+            {
+                DbSource oSource = new DbSource(oResult.getInt("id"),
+                                                oResult.getString("text_id"),
+                                                oResult.getString("name"),
+                                                oResult.getInt("url_id"),
+                                                oResult.getString("url"),
+                                                getArticleList(oResult.getInt("id"), iBatchID, iLimit));
                
-               oSources.add(oSource);
-           }
+                oSources.add(oSource);
+            }
         }
         finally
         {
-            if (oStatement != null) oStatement.close();
+            oStatement.close();
         }
         
         return(oSources);
     }
     
-   private Vector<DbArticle> getArticleList(int iSourceID, int iBatchID, int iLimit) throws SQLException, Exception
+   private Vector<DbArticle> getArticleList(int iSourceID, int iBatchID, int iLimit) throws SQLException, IOException
     {
-        PreparedStatement oStatement = null;
+        String strSQL = 
+            "select * from article_list_get(?, ?, ?)";
+        
+        PreparedStatement oStatement = getDb().prepareStatement(strSQL);
         Vector<DbArticle> oArticleList = new Vector<DbArticle>();
 
         try
         {
-            String strSQL = 
-                "select * from article_list_get(?, ?, ?)";
-            
-           oStatement = getDb().prepareStatement(strSQL);
            
            oStatement.setInt(1, iBatchID);
            oStatement.setInt(2, iSourceID);
@@ -279,7 +277,7 @@ public class DbToFileFlash extends Db
         }
         finally
         {
-            if (oStatement != null) oStatement.close();
+            oStatement.close();
         }
         
     return(oArticleList);
