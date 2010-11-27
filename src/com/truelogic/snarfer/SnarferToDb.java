@@ -8,6 +8,11 @@ import java.sql.*;
 import com.truelogic.snarfer.config.*;
 import com.truelogic.snarfer.db.*;
 
+/***********************************************************************************************************************
+* Stores articles and images from the snarfer object into the database.
+* 
+* @author David Steele
+***********************************************************************************************************************/
 public class SnarferToDb extends Db 
 {
     private Snarfer oSnarfer = null;
@@ -60,43 +65,35 @@ public class SnarferToDb extends Db
     
     private java.sql.Date getDate() throws SQLException, Exception
     {
-        PreparedStatement oStatement = null;
-        java.sql.Date oDate;
+        String strSQL = 
+            "select date(now()) as date";
+        
+        PreparedStatement oStatement = getDb().prepareStatement(strSQL);
         
         try
         {
-            String strSQL = 
-                "select date(now()) as date";
-            
-           oStatement = getDb().prepareStatement(strSQL);
-           
            ResultSet oResult = oStatement.executeQuery();
            
            if (oResult.next())
-               oDate = oResult.getDate("date");
+               return(oResult.getDate("date"));
            else
                throw new Exception("Unable to get date");
         }
         finally
         {
-            if (oStatement != null) oStatement.close();
+            oStatement.close();
         }
-        
-    return(oDate);
     }
     
     private int storeSource(String strTextID, String strName, String strURL) throws SQLException, Exception
     {
-        PreparedStatement oStatement = null;
-        int iSourceID = 0;
+        String strSQL = 
+            "select source_insert(?, ?, ?) as source_id";
+
+        PreparedStatement oStatement = getDb().prepareStatement(strSQL);;
         
         try
         {
-            String strSQL = 
-                "select source_insert(?, ?, ?) as source_id";
-            
-           oStatement = getDb().prepareStatement(strSQL);
-           
            oStatement.setString(1, strTextID);
            oStatement.setString(2, strName);
            oStatement.setString(3, strURL);
@@ -104,82 +101,72 @@ public class SnarferToDb extends Db
            ResultSet oResult = oStatement.executeQuery();
            
            if (oResult.next())
-               iSourceID = oResult.getInt("source_id");
+               return(oResult.getInt("source_id"));
            else
                throw new Exception("Unable to add a source");
         }
         finally
         {
-            if (oStatement != null) oStatement.close();
+            oStatement.close();
         }
-        
-    return(iSourceID);
     }
     
     private int storeBatch(java.sql.Date oDate) throws SQLException, Exception
     {
-        PreparedStatement oStatement = null;
-        int iBatchID = 0;
+        String strSQL = 
+            "select batch_insert(?) as batch_id";
+        
+        PreparedStatement oStatement = getDb().prepareStatement(strSQL);
         
         try
         {
-            String strSQL = 
-                "select batch_insert(?) as batch_id";
-            
-           oStatement = getDb().prepareStatement(strSQL);
            oStatement.setDate(1, oDate);
+
            ResultSet oResult = oStatement.executeQuery();
            
            if (oResult.next())
-               iBatchID = oResult.getInt("batch_id");
+               return(oResult.getInt("batch_id"));
            else
                throw new Exception("Unable to add a batch");
         }
         finally
         {
-            if (oStatement != null) oStatement.close();
+            oStatement.close();
         }
-        
-    return(iBatchID);
     }
     
     private int storeArticle(int iBatchID, int iSourceID, int iTier, 
                              String strText, String strTextURL, byte[] tyImage, 
                              String strImageURL) throws SQLException, Exception
     {
-        PreparedStatement oStatement = null;
-        int iArticleID = 0;
+        String strSQL = 
+            "select article_insert(?, ?, ?, ?, ?, ?, ?) as article_id";
+        
+        PreparedStatement oStatement = getDb().prepareStatement(strSQL);
         
         try
         {
-            String strSQL = 
-                "select article_insert(?, ?, ?, ?, ?, ?, ?) as article_id";
-            
-           oStatement = getDb().prepareStatement(strSQL);
-           
-           oStatement.setInt(1, iBatchID);
-           oStatement.setInt(2, iSourceID);
-           oStatement.setInt(3, iTier);
-           oStatement.setString(4, strText);
-           oStatement.setString(5, strTextURL);
+            oStatement.setInt(1, iBatchID);
+            oStatement.setInt(2, iSourceID);
+            oStatement.setInt(3, iTier);
+            oStatement.setString(4, strText);
+            oStatement.setString(5, strTextURL);
 
-           ByteArrayInputStream oImage = new ByteArrayInputStream(tyImage);
-           oStatement.setBinaryStream(6, oImage, tyImage.length);
+            ByteArrayInputStream oImage = new ByteArrayInputStream(tyImage);
+            oStatement.setBinaryStream(6, oImage, tyImage.length);
 
-           oStatement.setString(7, strImageURL);
+            oStatement.setString(7, strImageURL);
            
-           ResultSet oResult = oStatement.executeQuery();
+            ResultSet oResult = oStatement.executeQuery();
            
-           if (oResult.next())
-               iArticleID = oResult.getInt("article_id");
-           else
-               throw new Exception("Unable to add a source");
+            if (oResult.next())
+                return(oResult.getInt("article_id"));
+            else
+                throw new Exception("Unable to add a source");
         }
         finally
         {
-            if (oStatement != null) oStatement.close();
+            oStatement.close();
         }
-        
-    return(iArticleID);
     }
 }
