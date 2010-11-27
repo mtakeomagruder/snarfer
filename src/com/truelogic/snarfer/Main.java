@@ -7,7 +7,7 @@ import org.apache.log4j.*;
 import com.truelogic.snarfer.config.*;
 
 /***********************************************************************************************************************
-* <p>This class is the entry point for the program and runs the snarfer.</p>
+* <p>Entry point for the snarfer program.</p>
 * 
 * <p>A snarfer is a program that pulls data from some other source, generally not in the way that it was intended to be
 * accessed.  In this case, the snarfer pulls articles and images from news sites such as CNN and BBC.  News sources
@@ -35,6 +35,7 @@ import com.truelogic.snarfer.config.*;
 * the snarfer ran and show how the artworks would have looked on that day</p>
 * 
 * @author David Steele
+* @version 2.5
 ***********************************************************************************************************************/
 public class Main 
 {
