@@ -12,6 +12,7 @@ public class ConfigOutput
     private int iImageWidth;        // Output image width
     private int iImageHeight;       // Output image height
     private int iImageQuality;      // Output image JPEG quality
+    private ConfigReplace oReplace; // Replacement rules
 
     /*******************************************************************************************************************
     * Initializes ConfigOutput.
@@ -22,13 +23,15 @@ public class ConfigOutput
     * @param iImageHeight   Output image height
     * @param iImageQuality  Output image JPEG quality
     *******************************************************************************************************************/
-    public ConfigOutput(String strOutputDir, int iLimit, int iImageWidth, int iImageHeight, int iImageQuality)
+    public ConfigOutput(String strOutputDir, int iLimit, int iImageWidth, int iImageHeight, int iImageQuality,
+                        ConfigReplace oReplace)
     {
         this.strOutputDir = strOutputDir;
         this.iLimit = iLimit;
         this.iImageWidth = iImageWidth;
         this.iImageHeight = iImageHeight;
         this.iImageQuality = iImageQuality;
+        this.oReplace = oReplace;
     }
     
     /*******************************************************************************************************************
@@ -69,5 +72,13 @@ public class ConfigOutput
     public int getImageQuality() 
     {
         return(iImageQuality);
+    }
+
+    /*******************************************************************************************************************
+    * @return Replacement rules
+    *******************************************************************************************************************/
+    public ConfigReplace getReplace() 
+    {
+        return(oReplace);
     }
 }

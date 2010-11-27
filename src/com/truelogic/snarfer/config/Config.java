@@ -22,7 +22,8 @@ public class Config
     
     private ConfigDb oDb;                   // Database configuration
     private ConfigOutput oOutput;           // Output directory and files parameters
-    private ConfigReplace oReplace;         // Replacement rules for an article
+    private ConfigReplace oArticleReplace;  // Replacement rules for an article
+    private ConfigReplace oOutputReplace;   // Replacement rules for output
     
     private Vector<ConfigSource> oSources;  // List of news sources and RSS feeds
     
@@ -60,7 +61,8 @@ public class Config
                                    oIni.IntGet("output", "article_count", 100),
                                    oIni.IntGet("output", "image_width", 320),
                                    oIni.IntGet("output", "image_height", 240),
-                                   oIni.IntGet("output", "image_quality", 80));
+                                   oIni.IntGet("output", "image_quality", 80),
+                                   oOutputReplace = new ConfigReplace(oIni, "output_replace"));
 
         /***************************************************************************************************************
         * Load the DB parameters 
@@ -129,62 +131,54 @@ public class Config
             /***********************************************************************************************************
             * Read the article replacement rules  
             ***********************************************************************************************************/
-            iIndex = 1;
-            String strRules = "";
-            
-            String strRule = oIni.StringGet("replace_default", "rule" + iIndex, null);
-            
-            while (strRule != null)
-            {
-                strRules += strRule;
+            oArticleReplace = new ConfigReplace(oIni, "replace_default");
 
-                strRule = oIni.StringGet("replace_default", "rule" + iIndex, null);
-                
-                if (strRule != null)
-                    strRules += "\n";
-                
-                iIndex += 1;
-            }
-            
-            oReplace = new ConfigReplace(strRules);
-            
             /***********************************************************************************************************
             * Save the source if not null  
             ***********************************************************************************************************/
             if (strID != null)
                 oSources.add(new ConfigSource(strID, strURLs, strName, iImageWidthMin, iAspectRatioMax,
-                                              iArticleSizeMin, iArticleChunkSizeMin, iBorderWidth, oReplace));
+                                              iArticleSizeMin, iArticleChunkSizeMin, iBorderWidth, oArticleReplace));
         }
     }
      
-    /******************************************************************************************************************
-     * @return JDBC driver
-     ******************************************************************************************************************/
-     public ConfigDb getDb() 
-     {
-         return(oDb);
-     }
+    /*******************************************************************************************************************
+    * @return JDBC driver
+    *******************************************************************************************************************/
+    public ConfigDb getDb() 
+    {
+        return(oDb);
+    }
     
-     /******************************************************************************************************************
-     * @return Output directory and files parameters
-     ******************************************************************************************************************/
+    /*******************************************************************************************************************
+    * @return Output directory and files parameters
+    *******************************************************************************************************************/
      public ConfigOutput getOutput() 
      {
          return(oOutput);
      }
-     /******************************************************************************************************************
-     * @return Default list of replacement rules for articles
-     ******************************************************************************************************************/
-      public ConfigReplace getReplace() 
-      {
-          return(oReplace);
-      }
+     
+    /*******************************************************************************************************************
+    * @return Default list of replacement rules for articles
+    *******************************************************************************************************************/
+    public ConfigReplace getArticleReplace() 
+    {
+        return(oArticleReplace);
+    }
 
-     /******************************************************************************************************************
-     * @return List of news sources that will be scanned for valid articles
-     ******************************************************************************************************************/
-     public Vector<ConfigSource> getSources() 
-     {
-         return(oSources);
-     }
+    /*******************************************************************************************************************
+    * @return Default list of replacement rules for output
+    *******************************************************************************************************************/
+    public ConfigReplace getOutputReplace() 
+    {
+        return(oOutputReplace);
+    }
+
+    /*******************************************************************************************************************
+    * @return List of news sources that will be scanned for valid articles
+    *******************************************************************************************************************/
+    public Vector<ConfigSource> getSources() 
+    {
+        return(oSources);
+    }
 }

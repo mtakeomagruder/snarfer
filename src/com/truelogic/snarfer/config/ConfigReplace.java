@@ -8,10 +8,21 @@ import java.util.*;
 import au.com.bytecode.opencsv.*;
 
 // Project imports
-import com.truelogic.snarfer.exception.SnarferException;
+import com.truelogic.common.*;
+import com.truelogic.snarfer.exception.*;
 
 /***********************************************************************************************************************
 * This class loads a set of replacement rules from a CSV string.
+* 
+* <p>The strRules parameter passed to the constructor should have the following format:</p>
+* 
+* <p>"replace1","replacement1"<br/>
+* "quote",""""</br>
+* "\\n","linefeed"</p>
+* 
+* <p>Per standard CSV format, all quotes must be doubled.  All escaped characters must have a double forward 
+* slash or they will be treated as normal characters.  See examples above.  Standard Java regular expressions 
+* can be used if proper double escaping rules are followed.</p>
 * 
 * @author David Steele
 ***********************************************************************************************************************/
@@ -22,21 +33,49 @@ public class ConfigReplace extends HashMap<String, String>
     Vector<String> oKeys;                               // Replacement keys in order;
 
     /*******************************************************************************************************************
-    * <p>Initializes the replacement object.</p>
-    * 
-    * <p>The strRules parameter passed to the constructor should have the following format:</p>
-    * 
-    * <p>"replace1","replacement1"<br/>
-    * "quote",""""</br>
-    * "\\n","linefeed"</p>
-    * 
-    * <p>Per standard CSV format, all quotes must be doubled.  All escaped characters must have a double forward 
-    * slash or they will be treated as normal characters.  See examples above.  Standard Java regular expressions 
-    * can be used if proper double escaping rules are followed.</p>
+     * Initializes ConfigReplace.
+     * 
+     * @param oIni        Windows standard INI file to load replacement rules from
+     * @param strSection  Section where the replacement rules are stored
+     *******************************************************************************************************************/
+     public ConfigReplace(IniFile oIni, String strSection) throws IOException, SnarferException
+     {
+         int iIndex = 1;
+         String strRules = "";
+         
+         String strRule = oIni.StringGet(strSection, "rule" + iIndex, null);
+         
+         while (strRule != null)
+         {
+             strRules += strRule;
+
+             strRule = oIni.StringGet(strSection, "rule" + iIndex, null);
+             
+             if (strRule != null)
+                 strRules += "\n";
+             
+             iIndex += 1;
+         }
+
+         parse(strRules);
+     }
+    
+    /*******************************************************************************************************************
+    * Initializes ConfigReplace.
     * 
     * @param strRules  The CSV string that defines the rules
     *******************************************************************************************************************/
     public ConfigReplace(String strRules) throws IOException, SnarferException
+    {
+        parse(strRules);
+    }
+    
+    /*******************************************************************************************************************
+    * Parses the rules.
+    * 
+    * @param strRules  The CSV string that defines the rules
+    *******************************************************************************************************************/
+    private void parse(String strRules) throws IOException, SnarferException
     {
         oKeys = new Vector<String>();
         CSVReader oReader = new CSVReader(new StringReader(strRules));
