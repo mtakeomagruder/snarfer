@@ -9,6 +9,8 @@ import java.awt.image.*;
 import javax.imageio.*;
 import javax.imageio.stream.*;
 
+import org.apache.log4j.Logger;
+
 // Projects imports
 import com.truelogic.common.*;
 import com.truelogic.snarfer.config.*;
@@ -16,15 +18,24 @@ import com.truelogic.snarfer.db.*;
 import com.truelogic.snarfer.exception.*;
 
 /***********************************************************************************************************************
-* Represents a news source loaded from the database (denormalized).
+* Loads news sources and articles from the database and outputs them in a flash-friendly format.
 * 
 * @author David Steele
 ***********************************************************************************************************************/
 public class DbToFileFlash extends Db
 {
-    private java.sql.Date oDate;
-    private ConfigOutput oConfigOutput;
+    static Logger oLogger = Logger.getLogger(DbToFileFlash.class);
+
+    private java.sql.Date oDate;            // Date of the batch to output
+    private ConfigOutput oConfigOutput;     // Output configuration
     
+    /*******************************************************************************************************************
+    * Initialize DbFileToFlash.
+    * 
+    * @param oDate           Date of the batch to output
+    * @param oConfigDb       Database configuration
+    * @param oConfigOutput   Output configuration
+    *******************************************************************************************************************/
     public DbToFileFlash(java.sql.Date oDate, ConfigDb oConfigDb, ConfigOutput oConfigOutput) 
                          throws ClassNotFoundException, SQLException
     {
@@ -34,22 +45,40 @@ public class DbToFileFlash extends Db
         this.oConfigOutput = oConfigOutput;
     }
     
+    /*******************************************************************************************************************
+    * Outputs the batch to flash-friendly files.
+    *******************************************************************************************************************/
     public void run() throws SQLException, SnarferException, IOException
     {
+        /***************************************************************************************************************
+        * Get list of news sources to output 
+        ***************************************************************************************************************/
+        oLogger.info("Loading news sources");
+        
         int iBatchID = getBatch(oDate);
         Vector<DbSource> oSources = getSourceList(iBatchID);
-        FileWriter oTextWriter;
 
+        /***************************************************************************************************************
+        * Create the temporary output dir (remove it if it already exists) 
+        ***************************************************************************************************************/
+        oLogger.info("Creating temp directory");
+        
         String strSourceOutputDir = oConfigOutput.getOutputDir() + "00.tmp";
         FileUtil.removeDir(new File(strSourceOutputDir));
         (new File(strSourceOutputDir)).mkdir();
         strSourceOutputDir += "/flash/";
         (new File(strSourceOutputDir)).mkdir();
 
+        /***************************************************************************************************************
+        * Loop through the sources 
+        ***************************************************************************************************************/
         for (int iSourceIdx = 0; iSourceIdx < oSources.size(); iSourceIdx++)
         {
-            int iArticleIdx = 0;
+            /***********************************************************************************************************
+            * Output information about the source 
+            ***********************************************************************************************************/
             DbSource oSource = oSources.get(iSourceIdx);
+            oLogger.info("Saving source: " + oSource.getName());
 
             String strSource = 
                 "content=\r\n" +
@@ -59,28 +88,56 @@ public class DbToFileFlash extends Db
                 "url_id=" + oSource.getUrlID() + "\r\n" +
                 "url=" + oSource.getUrl();
                     
-            oTextWriter = new FileWriter(strSourceOutputDir + oSource.getTextID() + ".cnt");            
+            FileWriter oTextWriter = new FileWriter(strSourceOutputDir + oSource.getTextID() + ".cnt");            
             oTextWriter.write(strSource);
             oTextWriter.close();
+
+            /***************************************************************************************************************
+            * Loop through the articles
+            ***************************************************************************************************************/
+            int iArticleIdx = 0;
             
             for (DbArticle oArticle : oSource.getArticles())
             {
-                String strFileName = oSource.getTextID() + "-" + StringUtil.leftPad(iArticleIdx, 3, '0');
-            
-                oTextWriter = new FileWriter(strSourceOutputDir + strFileName + ".txt");
-                
-                String strText = oArticle.getText().replaceAll("\\&\\#039\\;", "'");
-                strText = strText.replaceAll("\\&\\#[0-9]+\\;", "");
-                strText = strText.replaceAll("\\&[a-z]+\\;", "");
+                oLogger.info("Loading article " + oSource.getTextID() + "-" + 
+                             StringUtil.leftPad(iArticleIdx, 3, '0') + ": " + oArticle.getTextUrl());
 
+                /*******************************************************************************************************
+                * Replace all strings defined in the rules   
+                *******************************************************************************************************/
+                oLogger.info("Replacing article text based on rules");
+
+                String strText = oArticle.getText();
+                
+                for (String strReplace : oConfigOutput.getReplace().getOrderedKeys())
+                    strText = strText.replaceAll(strReplace, oConfigOutput.getReplace().get(strReplace));
+
+                /*******************************************************************************************************
+                * Output the article text   
+                *******************************************************************************************************/
+                oLogger.info("Writing article text");
+                 
+                String strFileName = oSource.getTextID() + "-" + StringUtil.leftPad(iArticleIdx, 3, '0');
+
+                oTextWriter = new FileWriter(strSourceOutputDir + strFileName + ".txt");
                 oTextWriter.write("content=" + strText.trim());
                 oTextWriter.close();
                 
+                /*******************************************************************************************************
+                * Output the JPEG image
+                *******************************************************************************************************/
                 FileOutputStream oImageWriter = new FileOutputStream(strSourceOutputDir + strFileName + ".jpg");
+
+                oLogger.info("Writing JPEG");
 
                 oImageWriter.write(resizeImage(oArticle.getImage(), oConfigOutput.getImageWidth(), 
                                                oConfigOutput.getImageHeight(), oConfigOutput.getImageQuality()));
                 oImageWriter.close();
+
+                /*******************************************************************************************************
+                * Output information about the article
+                *******************************************************************************************************/
+                oLogger.info("Writing article information");
 
                 String strContent = 
                     "content=\r\n" +
@@ -98,6 +155,11 @@ public class DbToFileFlash extends Db
 
                 oTextWriter.write(strContent);
                 oTextWriter.close();
+
+                /*******************************************************************************************************
+                * Output information about the image
+                *******************************************************************************************************/
+                oLogger.info("Writing JPEG information");
 
                 strContent = 
                     "content=\r\n" +
@@ -117,30 +179,57 @@ public class DbToFileFlash extends Db
             }
         }
         
+        /***************************************************************************************************************
+        * Move the current directory to old and the temp directory to current 
+        ***************************************************************************************************************/
+        oLogger.info("Backup up old directory and rename temp directory");
+
         FileUtil.removeDir(new File(oConfigOutput.getOutputDir() + "00.old"));
         (new File(oConfigOutput.getOutputDir() + "00")).renameTo(new File(oConfigOutput.getOutputDir() + "00.old"));
         (new File(oConfigOutput.getOutputDir() + "00.tmp")).renameTo(new File(oConfigOutput.getOutputDir() + "00"));
     }
     
+    /*******************************************************************************************************************
+    * Resizes a JPEG image.
+    * 
+    * @param tyImage  JPEG image
+    * @param iWidth   Width of the new image
+    * @param iHeight  Height of the new image
+    * @param iQuality Quality of the new image
+    * 
+    * @return Resized JPEG image
+    *******************************************************************************************************************/
     private byte[] resizeImage(byte[] tyImage, int iWidth, int iHeight, int iQuality) throws IOException
     {
+        /***************************************************************************************************************
+        * Load the JPEG image into a BufferedImage 
+        ***************************************************************************************************************/
         ByteArrayInputStream oInput = new ByteArrayInputStream(tyImage);
         BufferedImage oImage = ImageIO.read(oInput);
         
+        /***************************************************************************************************************
+        * Resize the image 
+        ***************************************************************************************************************/
         BufferedImage oImageNew = new BufferedImage(iWidth, iHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D oGraphics = oImageNew.createGraphics();
         oGraphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                                     RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         oGraphics.drawImage(oImage, 0, 0, iWidth, iHeight, null);
         
+        /***************************************************************************************************************
+        * Convert the resized image to JPEG 
+        ***************************************************************************************************************/
         ByteArrayOutputStream oOutput = new ByteArrayOutputStream();
         MemoryCacheImageOutputStream oImageOutput = new MemoryCacheImageOutputStream(oOutput);
         Iterator<ImageWriter> oImageIterator = ImageIO.getImageWritersByFormatName("jpeg");
         ImageWriter oImageWriter = (ImageWriter)oImageIterator.next();
         ImageWriteParam oImageWriterParam = oImageWriter.getDefaultWriteParam();
         oImageWriterParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-        oImageWriterParam.setCompressionQuality((float) .9);   // an integer between 0 and 1
+        oImageWriterParam.setCompressionQuality((float) .9);
         
+        /***************************************************************************************************************
+        * Write the image to a byte array 
+        ***************************************************************************************************************/
         oImageWriter.setOutput(oImageOutput);
         IIOImage oImageTemp = new IIOImage(oImageNew, null, null);
         oImageWriter.write(null, oImageTemp, oImageWriterParam);
@@ -149,6 +238,13 @@ public class DbToFileFlash extends Db
         return(oOutput.toByteArray());
     }
     
+    /*******************************************************************************************************************
+    * Gets a batch from the database.
+    * 
+    * @param oDate  Batch date
+    * 
+    * @return Batch DB ID
+    *******************************************************************************************************************/
     private int getBatch(java.sql.Date oDate) throws SQLException, SnarferException
     {
         String strSQL = "";
@@ -183,6 +279,13 @@ public class DbToFileFlash extends Db
     return(iBatchID);
     }
     
+    /*******************************************************************************************************************
+    * Gets batch news sources from the database.
+    * 
+    * @param iBatchID  Batch DB ID
+    * 
+    * @return List of news sources
+    *******************************************************************************************************************/
     private Vector<DbSource> getSourceList(int iBatchID) throws SQLException, IOException
     {
         String strSQL = 
@@ -207,6 +310,8 @@ public class DbToFileFlash extends Db
            
             while (oResult.next())
             {
+                oLogger.info("Loading source: " + oResult.getString("text_id"));
+                
                 DbSource oSource = new DbSource(oResult.getInt("id"),
                                                 oResult.getString("text_id"),
                                                 oResult.getString("name"),
@@ -226,7 +331,15 @@ public class DbToFileFlash extends Db
         return(oSources);
     }
     
-   private Vector<DbArticle> getArticleList(int iSourceID, int iBatchID, int iLimit) throws SQLException, IOException
+    /*******************************************************************************************************************
+    * Gets a list of articles from a batch and news source.
+    * 
+    * @param iSourceID  Source DB ID
+    * @param iBatchID   Batch DB ID
+    * 
+    * @return List of articles
+    *******************************************************************************************************************/
+    private Vector<DbArticle> getArticleList(int iSourceID, int iBatchID, int iLimit) throws SQLException, IOException
     {
         String strSQL = 
             "select * from article_list_get(?, ?, ?)";
