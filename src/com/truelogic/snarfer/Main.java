@@ -89,7 +89,7 @@ public class Main
         ***************************************************************************************************************/
         oLogger.info("Saving snarfer data to files (flash)");
         DbToFileFlash oDbToFile = new DbToFileFlash(oDate, oConfig.getDb(), oConfig.getOutput());
-//        oDbToFile.run();
+        oDbToFile.run();
     }
     
     /*******************************************************************************************************************
@@ -102,7 +102,15 @@ public class Main
         oLogger.info("------------------------------------------------------------");
         oLogger.info("Snarfer started");
         
+        try
+        {
         Main oMain = new Main();
         oMain.run(stryArgs);
+        }
+        catch (Exception oException)
+        {
+            oLogger.error("Fatal", oException);
+            throw oException;
+        }
     }
 }
