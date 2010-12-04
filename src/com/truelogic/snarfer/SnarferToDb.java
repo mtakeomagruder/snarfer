@@ -15,8 +15,13 @@ import com.truelogic.snarfer.db.*;
 ***********************************************************************************************************************/
 public class SnarferToDb extends Db 
 {
-    private Snarfer oSnarfer = null;
+    private Snarfer oSnarfer;   // Snarfer object with all articles
     
+    /*******************************************************************************************************************
+    * Initializes Snarfer2DB.
+    * 
+    * @param strArgs  Arguments passed on the command line
+    *******************************************************************************************************************/
     public SnarferToDb(Snarfer oSnarfer, ConfigDb oConfigDb) throws ClassNotFoundException, SQLException
     {
         super(oConfigDb);
@@ -53,7 +58,7 @@ public class SnarferToDb extends Db
                 }
             }
             
-            getDb().commit();
+            //getDb().commit();
         }
         finally
         {

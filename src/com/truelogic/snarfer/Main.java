@@ -41,7 +41,7 @@ public class Main
 {
     static Logger oLogger = Logger.getLogger(Main.class);
     
-    Config oConfig;
+    Config oConfig;                 // Snarfer configuration
     
     /*******************************************************************************************************************
     * Loads the snarfer parameters.
@@ -81,7 +81,7 @@ public class Main
             ***********************************************************************************************************/
             oLogger.info("Saving snarfer data to the DB");
             SnarferToDb oSnarferToDb = new SnarferToDb(oSnarfer, oConfig.getDb());
-//            oDate = oSnarferToDb.run();
+            oDate = oSnarferToDb.run();
         }
 
         /***************************************************************************************************************
