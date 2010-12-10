@@ -41,9 +41,10 @@ public class SnarferToDb extends Db
             oDate = getDate();
             iBatchID = storeBatch(oDate);
             
-            for (int iSourceIdx = 0; iSourceIdx < oSnarfer.sourceSize(); iSourceIdx++)
+            // Make this a for each
+            for (int iSourceIdx = 0; iSourceIdx < oSnarfer.size(); iSourceIdx++)
             {
-                Source oSource = oSnarfer.sourceGet(iSourceIdx);
+                Source oSource = oSnarfer.get(iSourceIdx);
 
                 iSourceID = storeSource(oSource.getConfig().getID(), oSource.getConfig().getName(), 
                                         oSource.getConfig().getURLs().get(0));

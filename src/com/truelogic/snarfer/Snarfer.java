@@ -6,31 +6,21 @@ import java.util.*;
 // Project imports
 import com.truelogic.snarfer.config.*;
 
-public class Snarfer 
+public class Snarfer extends Vector<Source> 
 {
-    Vector<Source> oSourceList = new Vector<Source>();
-    
-    public void sourceAdd(ConfigSource oConfig) throws Exception
+    private static final long serialVersionUID = 1L;
+
+    public void add(ConfigSource oConfig) throws Exception
     {
         Source oSource = new Source(oConfig);
-        oSourceList.add(oSource);
-    }
-    
-    public int sourceSize()
-    {
-        return(oSourceList.size());
-    }
-    
-    public Source sourceGet(int iIndex)
-    {
-        return(oSourceList.get(iIndex));
+        add(oSource);
     }
     
     public void run()
     {
-        for (int iIndex = 0; iIndex < sourceSize(); iIndex++)
+        for (int iIndex = 0; iIndex < size(); iIndex++)
         {
-            sourceGet(iIndex).run();
+            get(iIndex).run();
         }
     }
 }

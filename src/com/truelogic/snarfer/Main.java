@@ -68,7 +68,7 @@ public class Main
             oLogger.info("Inserting sources into the snarfer");
             
             for (ConfigSource oData : oConfig.getSources())
-                oSnarfer.sourceAdd(oData);
+                oSnarfer.add(oData);
             
             /***********************************************************************************************************
             * Run the snarfer
