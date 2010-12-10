@@ -54,7 +54,7 @@ public class Main
         * Load parameters and initialize the snarfer
         ***************************************************************************************************************/
         oConfig = new Config("snarfer.ini");
-        java.sql.Date oDate = new java.sql.Date(System.currentTimeMillis());
+        java.sql.Date oDate = null;
         Snarfer oSnarfer = new Snarfer();
         
         /***************************************************************************************************************
@@ -88,6 +88,7 @@ public class Main
         * Save data from the DB into files on disk
         ***************************************************************************************************************/
         oLogger.info("Saving snarfer data to files (flash)");
+        
         DbToFileFlash oDbToFile = new DbToFileFlash(oDate, oConfig.getDb(), oConfig.getOutput());
         oDbToFile.run();
     }
@@ -104,8 +105,8 @@ public class Main
         
         try
         {
-        Main oMain = new Main();
-        oMain.run(stryArgs);
+            Main oMain = new Main();
+            oMain.run(stryArgs);
         }
         catch (Exception oException)
         {
