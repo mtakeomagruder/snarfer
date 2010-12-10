@@ -52,7 +52,7 @@ public class Article
     private String strText = null;          // The article text
     
     /*******************************************************************************************************************
-    * Initalizes the article object.
+    * Initializes the article object.
     * 
     * @param oSource  The news source object
     * @param iTier    The tier (1 is top level, 2 or greater for all else)
