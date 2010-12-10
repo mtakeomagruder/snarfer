@@ -18,7 +18,7 @@ public class ConfigSource
     private int iArticleSizeMin;                            // Minimum size for the article text
     private int iArticleChunkSizeMin;                       // Minimum chunk size for each section of the article
     private int iBorderWidth;                               // The width of the image border to crop
-    private ConfigReplace oArticleReplace;                 // Replacement rules
+    private ConfigReplace oArticleReplace;                  // Replacement rules
     
     /*******************************************************************************************************************
     * Initializes the SourceData object.
