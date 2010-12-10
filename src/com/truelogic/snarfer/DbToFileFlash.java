@@ -241,7 +241,7 @@ public class DbToFileFlash extends Db
     /*******************************************************************************************************************
     * Gets a batch from the database.
     * 
-    * @param oDate  Batch date
+    * @param oDate  Batch date (If null then max day is used)
     * 
     * @return Batch DB ID
     *******************************************************************************************************************/
