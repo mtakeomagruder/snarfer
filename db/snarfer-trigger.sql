@@ -1,6 +1,6 @@
---******************************************************************************
+--**********************************************************************************************************************
 --* OBJECT Insert Trigger 
---******************************************************************************
+--**********************************************************************************************************************
 CREATE or REPLACE FUNCTION object_trigger_insert() RETURNS trigger AS $$
     BEGIN
     insert into object (id, type) values (new.id, lower(tg_relname));
@@ -45,9 +45,9 @@ CREATE TRIGGER genetic_project_profile_image_lock_trigger_insert BEFORE INSERT O
 CREATE TRIGGER genetic_project_profile_image_job_trigger_insert BEFORE INSERT ON genetic_project_profile_image_job
     FOR EACH ROW EXECUTE PROCEDURE object_trigger_insert();
 
---******************************************************************************
+--**********************************************************************************************************************
 --* OBJECT Delete Trigger 
---******************************************************************************
+--**********************************************************************************************************************
 create or replace function object_trigger_delete() returns trigger as $$
     BEGIN
     delete from object 
@@ -93,9 +93,11 @@ CREATE TRIGGER genetic_project_profile_image_lock_trigger_delete AFTER DELETE ON
 CREATE TRIGGER genetic_project_profile_image_job_trigger_delete AFTER DELETE ON genetic_project_profile_image_job
     FOR EACH ROW EXECUTE PROCEDURE object_trigger_delete();
 
---******************************************************************************
---* Article delete trigger
---******************************************************************************
+--**********************************************************************************************************************
+--* ARTICLE Delete Trigger
+--*
+--* Make sure that all orphaned images are deleted when an article is deleted.
+--**********************************************************************************************************************
 create or replace function article_trigger_delete() returns trigger as $$
 declare    
     iCount int;    
@@ -117,9 +119,11 @@ $$ language 'plpgsql';
 CREATE TRIGGER article_trigger_delete2 AFTER DELETE ON article
     FOR EACH ROW EXECUTE PROCEDURE article_trigger_delete();
 
---******************************************************************************
---* Batch_article delete trigger
---******************************************************************************
+--**********************************************************************************************************************
+--* BATCH_ARTICLE Delete Trigger
+--*
+--* Make sure that all orphaned articles are deleted when a batch is deleted.
+--**********************************************************************************************************************
 create or replace function batch_article_trigger_delete() returns trigger as $$
 declare    
     iCount int;    
