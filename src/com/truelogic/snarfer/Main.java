@@ -19,12 +19,12 @@ import com.truelogic.snarfer.config.*;
 * changed to use RSS feeds.  In 2005 these had not produced sufficient data, but by 2010 they listed more articles than 
 * we were getting from walking the HTML pages.</p>
 * 
-* <p>The current version is consists of these steps:</p>
+* <p>The current version consists of these steps:</p>
 * <p>1. A list of articles is created from the provided RSS feeds for each site.</p>
 * <p>2. Each HTML page is loaded and the article text is scraped off.  The article image is identified by its 
 * proportions and size.<p>
 * <p>3. The data is saved into the DB from the internal structures in a single transaction.</p>
-* <p>4. The data is then exported from the DB to disk files as needed.</p>
+* <p>4. The data is then exported from the DB to files on disk as needed.</p>
 * 
 * <p>The snarfer runs daily and if it runs twice it overwrites the data for that day.  Initialization parameters are
 * stored in the SNARFER.INI file which follows a standard windows INI format.</p>
@@ -99,8 +99,7 @@ public class Main
     *******************************************************************************************************************/
     public static void main(String[] stryArgs) throws Exception
     {
-        oLogger.info("------------------------------------------------------------");
-        oLogger.info("Snarfer started");
+        oLogger.info("------------------------------ SNARFER STARTED ------------------------------");
         
         try
         {

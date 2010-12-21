@@ -9,6 +9,7 @@ import java.awt.image.*;
 import javax.imageio.*;
 import javax.imageio.stream.*;
 
+//Third Party imports
 import org.apache.log4j.Logger;
 
 // Projects imports
@@ -59,7 +60,7 @@ public class DbToFileFlash extends Db
         Vector<DbSource> oSources = getSourceList(iBatchID);
 
         /***************************************************************************************************************
-        * Create the temporary output dir (remove it if it already exists) 
+        * Create the temporary output directory (remove it if it already exists) 
         ***************************************************************************************************************/
         oLogger.info("Creating temp directory");
         
@@ -72,12 +73,11 @@ public class DbToFileFlash extends Db
         /***************************************************************************************************************
         * Loop through the sources 
         ***************************************************************************************************************/
-        for (int iSourceIdx = 0; iSourceIdx < oSources.size(); iSourceIdx++)
+        for (DbSource oSource : oSources)
         {
             /***********************************************************************************************************
             * Output information about the source 
             ***********************************************************************************************************/
-            DbSource oSource = oSources.get(iSourceIdx);
             oLogger.info("Saving source: " + oSource.getName());
 
             String strSource = 

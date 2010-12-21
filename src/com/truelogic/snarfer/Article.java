@@ -319,7 +319,7 @@ public class Article
         ***************************************************************************************************************/
         try
         {
-            oImageNodeList = oParser.extractAllNodesThatMatch (new TagNameFilter ("img"));
+            oImageNodeList = oParser.extractAllNodesThatMatch(new TagNameFilter ("img"));
         }
         catch (Exception oException)
         {
@@ -332,7 +332,7 @@ public class Article
         ***************************************************************************************************************/
         for (int iIdx = 0; iIdx < oImageNodeList.size (); iIdx++)
         {
-            ImageTag oImage = (ImageTag)oImageNodeList.elementAt (iIdx);
+            ImageTag oImage = (ImageTag)oImageNodeList.elementAt(iIdx);
 
             /***********************************************************************************************************
             * Get the image height and width 

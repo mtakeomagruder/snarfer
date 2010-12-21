@@ -69,7 +69,7 @@ public class SnarferToDb extends Db
                                  oArticle.getImage(), oArticle.getImageURL());
             }
             
-            //getDb().commit();
+            getDb().commit();
         }
         finally
         {

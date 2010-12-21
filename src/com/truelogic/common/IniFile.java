@@ -20,6 +20,13 @@ import java.util.*;
 public class IniFile
 {
     /*******************************************************************************************************************
+    * Constants
+    *******************************************************************************************************************/
+    private static String strEQUAL = "=";
+    private static char cLEFT_BRACKET = '[';
+    private static char cRIGHT_BRACKET = ']';
+    
+    /*******************************************************************************************************************
     * Local Variables
     *******************************************************************************************************************/
     private HashMap<String, HashMap<String, String>> oSections = new HashMap<String, HashMap<String, String>>();
@@ -56,7 +63,8 @@ public class IniFile
                     /***************************************************************************************************
                     * If this is a section header, create a new section
                     ***************************************************************************************************/
-                    if ((strLine.charAt(0) == '[') && (strLine.charAt(strLine.length() - 1) == ']'))
+                    if ((strLine.charAt(0) == cLEFT_BRACKET) && 
+                        (strLine.charAt(strLine.length() - 1) == cRIGHT_BRACKET))
                     {
                         String strSection = strLine.substring(1, strLine.length() - 1).toUpperCase();
                         
@@ -70,9 +78,9 @@ public class IniFile
                     /***************************************************************************************************
                     * Else if this is a key/value pair, create a new key/value
                     ***************************************************************************************************/
-                    else if ((oKeys != null) && (strLine.indexOf("=") != -1))
+                    else if ((oKeys != null) && (strLine.indexOf(strEQUAL) != -1))
                     {
-                        int iEqualIdx = strLine.indexOf("=");
+                        int iEqualIdx = strLine.indexOf(strEQUAL);
                         oKeys.put(strLine.substring(0, iEqualIdx).toUpperCase(), 
                                   strLine.substring(iEqualIdx + 1, strLine.length()));
                     }

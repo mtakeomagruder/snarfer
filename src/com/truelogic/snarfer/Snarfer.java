@@ -31,9 +31,7 @@ public class Snarfer extends Vector<Source>
     *******************************************************************************************************************/
     public void run()
     {
-        for (int iIndex = 0; iIndex < size(); iIndex++)
-        {
-            get(iIndex).run();
-        }
+        for (Source oSource : this)
+            oSource.run();
     }
 }

@@ -29,7 +29,7 @@ public class Source extends Vector<Article>
     private ConfigSource oConfig;       // Source configuration
     
     /*******************************************************************************************************************
-    * Initalizes the new source.
+    * Initializes the new source.
     * 
     * @param oConfig  Source configuration
     *******************************************************************************************************************/
@@ -100,7 +100,7 @@ public class Source extends Vector<Article>
                     * Attempt to retrieve the article
                     ***************************************************************************************************/
                     Article oArticle = new Article(this, iDepth, oEntry.getUri());
-
+                    
                     /***************************************************************************************************
                     * If the article is valid then store it
                     ***************************************************************************************************/

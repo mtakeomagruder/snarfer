@@ -58,10 +58,10 @@ public class Config
         oLogger.info("Loading general properties");
         
         oOutput = new ConfigOutput(oIni.StringGet("output", "dir"), 
-                                   oIni.IntGet("output", "article_count", 100),
-                                   oIni.IntGet("output", "image_width", 320),
-                                   oIni.IntGet("output", "image_height", 240),
-                                   oIni.IntGet("output", "image_quality", 80),
+                                   oIni.IntGet("output", "article_count"),
+                                   oIni.IntGet("output", "image_width"),
+                                   oIni.IntGet("output", "image_height"),
+                                   oIni.IntGet("output", "image_quality"),
                                    oOutputReplace = new ConfigReplace(oIni, "output_replace"));
 
         /***************************************************************************************************************
@@ -75,22 +75,17 @@ public class Config
                            oIni.StringGet("db", "password", ""));
           
         /***************************************************************************************************************
-        * Get the source count 
-        ***************************************************************************************************************/
-        oLogger.info("Loading sources");
-        int iSourceCount = oIni.IntGet("source", "count", 0);
-        oLogger.info(iSourceCount + " source(s) found");
-
-        /***************************************************************************************************************
         * Load each source 
         ***************************************************************************************************************/
-        for (int iSourceIdx = 0; iSourceIdx < iSourceCount; iSourceIdx++)
+        int iSourceIdx = 1;
+        
+        while (oIni.StringGet("source", "source" + iSourceIdx, null) != null)
         {
             /***********************************************************************************************************
             * Get the source ID 
             ***********************************************************************************************************/
-            String strID = oIni.StringGet("source", "source" + (iSourceIdx + 1));
-            oLogger.info("Loading source " + (iSourceIdx + 1) + ": " + strID);
+            String strID = oIni.StringGet("source", "source" + iSourceIdx);
+            oLogger.info("Loading source " + iSourceIdx + ": " + strID);
 
             /***********************************************************************************************************
             * Get the list of source RSS URLs  
@@ -108,25 +103,25 @@ public class Config
                 strURL = oIni.StringGet(strID, "url" + iIndex, null);
             }
 
-            oLogger.info((iIndex - 1) + " URLs found for source " + (iSourceIdx + 1));
+            oLogger.info((iIndex - 1) + " URLs found for source " + iSourceIdx);
             
             /***********************************************************************************************************
             * Get the rest of the source parameters  
             ***********************************************************************************************************/
-            oLogger.info("Loading parameters for source " + (iSourceIdx + 1));
+            oLogger.info("Loading parameters for source " + iSourceIdx);
 
             String strName = oIni.StringGet(strID, "name");
             
             int iImageWidthMin = oIni.IntGet(strID, "image_width_min", 
-                                             oIni.IntGet("source_default", "image_width_min", 150));
+                                             oIni.IntGet("source_default", "image_width_min"));
             int iAspectRatioMax = oIni.IntGet(strID, "aspect_ratio_max", 
-                                              oIni.IntGet("source_default", "aspect_ratio_max", 2));
+                                              oIni.IntGet("source_default", "aspect_ratio_max"));
             int iArticleSizeMin = oIni.IntGet(strID, "article_size_min", 
-                                              oIni.IntGet("source_default", "article_size_min", 1000));
+                                              oIni.IntGet("source_default", "article_size_min"));
             int iArticleChunkSizeMin = oIni.IntGet(strID, "article_chunk_size_min", 
-                                                   oIni.IntGet("source_default", "article_chunk_size_min", 100));
+                                                   oIni.IntGet("source_default", "article_chunk_size_min"));
             int iBorderWidth = oIni.IntGet(strID, "border_width", 
-                                           oIni.IntGet("source_default", "border_width", 1));
+                                           oIni.IntGet("source_default", "border_width"));
 
             /***********************************************************************************************************
             * Read the article replacement rules  
@@ -139,7 +134,11 @@ public class Config
             if (strID != null)
                 oSources.add(new ConfigSource(strID, strURLs, strName, iImageWidthMin, iAspectRatioMax,
                                               iArticleSizeMin, iArticleChunkSizeMin, iBorderWidth, oArticleReplace));
+            
+            iSourceIdx++;
         }
+
+        oLogger.info((iSourceIdx - 1) + " source(s) found");
     }
      
     /*******************************************************************************************************************
