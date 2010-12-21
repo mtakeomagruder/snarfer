@@ -99,6 +99,7 @@ public class Main
     *******************************************************************************************************************/
     public static void main(String[] stryArgs) throws Exception
     {
+        PropertyConfigurator.configure("log4j.properties");
         oLogger.info("------------------------------ SNARFER STARTED ------------------------------");
         
         try
