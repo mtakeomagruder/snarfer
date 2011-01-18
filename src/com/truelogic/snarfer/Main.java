@@ -1,10 +1,15 @@
 package com.truelogic.snarfer;
 
 // Third party imports
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.apache.log4j.*;
 
 // Project imports
+import com.truelogic.common.IniException;
 import com.truelogic.snarfer.config.*;
+import com.truelogic.snarfer.exception.SnarferException;
 
 /***********************************************************************************************************************
 * <p>Entry point for the snarfer program.</p>
@@ -48,7 +53,7 @@ public class Main
     * 
     * @param strArgs  Arguments passed on the command line
     *******************************************************************************************************************/
-    public void run(String[] stryArgs) throws Exception
+    public void run(String[] stryArgs) throws IniException, IOException, SnarferException, ClassNotFoundException, SQLException
     {
         /***************************************************************************************************************
         * Load parameters and initialize the snarfer

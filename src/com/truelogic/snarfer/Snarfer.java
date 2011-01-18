@@ -5,6 +5,7 @@ import java.util.*;
 
 // Project imports
 import com.truelogic.snarfer.config.*;
+import com.truelogic.snarfer.exception.SnarferException;
 
 /***********************************************************************************************************************
 * This class loads articles from all the new sources.
@@ -20,7 +21,7 @@ public class Snarfer extends Vector<Source>
     * 
     * @param oConfig  Configuration for the news source
     *******************************************************************************************************************/
-    public void add(ConfigSource oConfig) throws Exception
+    public void add(ConfigSource oConfig) throws SnarferException
     {
         Source oSource = new Source(oConfig);
         add(oSource);

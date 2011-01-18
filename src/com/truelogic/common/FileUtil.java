@@ -15,7 +15,7 @@ public class FileUtil
     * 
     * @param oDirectory  The file or directory to remove
     *******************************************************************************************************************/
-    public static void removeDir(File oDirectory)
+    public static void removeDir(File oDirectory) throws IOException
     {
         if (oDirectory.isDirectory())      
         {
@@ -28,6 +28,7 @@ public class FileUtil
             }
         }
 
-        oDirectory.delete();                           
+        if (oDirectory.delete() == false)
+            throw new IOException("Unable to delete " + oDirectory.getPath());
     }    
 }

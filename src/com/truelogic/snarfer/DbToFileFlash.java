@@ -65,7 +65,8 @@ public class DbToFileFlash extends Db
         oLogger.info("Creating temp directory");
         
         String strSourceOutputDir = oConfigOutput.getOutputDir() + "00.tmp";
-        FileUtil.removeDir(new File(strSourceOutputDir));
+        if ((new File(strSourceOutputDir)).exists())
+            FileUtil.removeDir(new File(strSourceOutputDir));
         (new File(strSourceOutputDir)).mkdir();
         strSourceOutputDir += "/flash/";
         (new File(strSourceOutputDir)).mkdir();
@@ -184,9 +185,15 @@ public class DbToFileFlash extends Db
         ***************************************************************************************************************/
         oLogger.info("Backup up old directory and rename temp directory");
 
-        FileUtil.removeDir(new File(oConfigOutput.getOutputDir() + "00.old"));
-        (new File(oConfigOutput.getOutputDir() + "00")).renameTo(new File(oConfigOutput.getOutputDir() + "00.old"));
-        (new File(oConfigOutput.getOutputDir() + "00.tmp")).renameTo(new File(oConfigOutput.getOutputDir() + "00"));
+        if ((new File(oConfigOutput.getOutputDir() + "00.old")).exists())
+            FileUtil.removeDir(new File(oConfigOutput.getOutputDir() + "00.old"));
+        if ((new File(oConfigOutput.getOutputDir() + "00")).exists())
+            if ((new File(oConfigOutput.getOutputDir() + 
+                          "00")).renameTo(new File(oConfigOutput.getOutputDir() + "00.old")) == false)
+            throw new IOException("Unable to rename 00 to 00.old");
+        if ((new File(oConfigOutput.getOutputDir() + 
+                      "00.tmp")).renameTo(new File(oConfigOutput.getOutputDir() + "00")) == false)
+            throw new IOException("Unable to rename 00.tmp to 00");
     }
     
     /*******************************************************************************************************************
